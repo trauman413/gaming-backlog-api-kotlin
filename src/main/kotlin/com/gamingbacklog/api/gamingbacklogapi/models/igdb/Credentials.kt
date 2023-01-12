@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor
 data class Credentials(
   val access_token: String,
   val expires_in: String,
-  val grant_type: String
+  val token_type: String
 ) {
 
 }

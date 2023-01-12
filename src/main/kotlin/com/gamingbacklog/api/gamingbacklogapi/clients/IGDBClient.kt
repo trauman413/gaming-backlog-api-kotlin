@@ -15,7 +15,7 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
 @Component
-class IGDBClient {
+class IGDBClient(private val externalAPICall: ExternalAPICall) {
 
   @Value("\${igdb.client.id}")
   val clientId: String = ""
@@ -26,21 +26,20 @@ class IGDBClient {
   val authUri = "https://id.twitch.tv/oauth2/token"
   val baseUri = "https://api.igdb.com/v4/"
 
+
   /**
    * Generates a token
    */
   fun authenticate(): Credentials {
-    val request: HttpRequest = HttpRequest.newBuilder()
-      .uri(URI.create("$authUri?client_id=$clientId&client_secret=$clientSecret&grant_type=client_credentials"))
-      .POST(HttpRequest.BodyPublishers.noBody())
-      .build()
-    try {
-      val response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString())
-      return Gson().fromJson(response.body(), Credentials::class.java)
-    } catch (ex: Exception) {
-      ex.printStackTrace()
+    val response = externalAPICall.postExternalCall(
+      "$authUri?client_id=$clientId&client_secret=$clientSecret&grant_type=client_credentials"
+    )
+    return if (response.statusCode() == 200) {
+      Gson().fromJson(response.body(), Credentials::class.java)
+    } else {
+      println("Status Code: ${response.statusCode()}, Error: ${response.body()}")
+      Credentials("", "", "")
     }
-    return Credentials("", "", "")
   }
 
   /**
@@ -54,23 +53,18 @@ class IGDBClient {
     gameID: String
   ): Array<IGDBGame> {
     val body = "fields name, platforms.name, genres.name, release_dates.human, summary, franchises.name, involved_companies.company.name, artworks.url; where id =$gameID;"
-    val request: HttpRequest = HttpRequest.newBuilder()
-      .uri(URI.create("${baseUri}games/"))
-      .POST(HttpRequest.BodyPublishers.ofString(body))
-      .header("Client-ID", clientId)
-      .header("Authorization", "Bearer $accessToken")
-      .build()
-    try {
-      val response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString())
-      println("Request: ${request.uri()} Body: ${request.bodyPublisher()}")
-      println("Response: ${response.body()}")
-      // todo: need better error handling here for 404
-      return Gson().fromJson(response.body(), Array<IGDBGame>::class.java)
-    } catch (ex: Exception) {
-      ex.printStackTrace()
+    val headers = HashMap<String, String>()
+    headers["Client-ID"] = clientId
+    headers["Authorization"] = "Bearer $accessToken"
+    val response = externalAPICall.postExternalCall("${baseUri}games/", body, headers)
+    return if (response.statusCode() == 200 && response.body() != "[]") {
+      Gson().fromJson(response.body(), Array<IGDBGame>::class.java)
+    } else {
+      println("Status Code: ${if (response.statusCode() == 200) 404 else response.statusCode() }, " +
+        "Error: ${if (response.body() == "[]") "Not found" else response.body()}")
+      val blank = IGDBGame(0, emptyArray(), emptyArray(), emptyArray(), emptyArray(), "", emptyArray(), emptyArray(), "")
+      arrayOf(blank)
     }
-    val blank = IGDBGame(0, emptyArray(), emptyArray(), emptyArray(), emptyArray(), "", emptyArray(), emptyArray(), "")
-    return arrayOf(blank)
   }
 
 

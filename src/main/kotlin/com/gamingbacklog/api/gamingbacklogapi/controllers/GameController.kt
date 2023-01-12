@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*
 class GameController(
   private val gameService: GameService,
   private val igdbClient: IGDBClient
-
 ) {
 
   /**
