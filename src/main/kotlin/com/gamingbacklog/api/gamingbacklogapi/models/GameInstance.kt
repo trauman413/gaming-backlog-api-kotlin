@@ -8,13 +8,15 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.util.*
 
-@Document("games")
+@Document("gameInstances")
 @NoArgsConstructor
 @Data
 @AllArgsConstructor
-data class Game (
+data class GameInstance(
   @Id
   val id: String = ObjectId.get().toString(),
+
+  // igdb-specific data
   val igdbId: Long,
   val name: String,
   val platforms: List<String>,
@@ -24,4 +26,12 @@ data class Game (
   val releaseDate: Date,
   val images: List<String>,
 
+  // user-custom data
+  val rating: Int?,
+  val review: String?,
+  val ranking: String?,
+  val yearPlayed: Int?,
+  val yearReceived: Int?,
+  val notes: String?,
+  val platformsOwnedOn: List<String>?
   )

@@ -6,6 +6,7 @@ import com.gamingbacklog.api.gamingbacklogapi.requests.GameRequest
 import com.gamingbacklog.api.gamingbacklogapi.requests.Request
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class GameService(
@@ -21,16 +22,19 @@ class GameService(
 
   override fun create(request: Request): Game {
     val gameRequest = request as GameRequest
-    val platform: String = if (gameRequest.platform == null) "" else gameRequest.platform!!
-    val genre: String = if (gameRequest.genre == null) "" else gameRequest.genre!!
-    val universe: String = if (gameRequest.universe == null) "" else gameRequest.universe!!
-    val company: String = if (gameRequest.company == null) "" else gameRequest.company!!
+    val platform: List<String> = if (gameRequest.platform == null) emptyList() else gameRequest.platform!!
+    val genre: List<String> = if (gameRequest.genre == null) emptyList() else gameRequest.genre!!
+    val universe: List<String> = if (gameRequest.universe == null) emptyList() else gameRequest.universe!!
+    val company: List<String> = if (gameRequest.company == null) emptyList() else gameRequest.company!!
     val game = Game(
       name = gameRequest.name,
-      platform = platform,
-      genre = genre,
-      universe = universe,
-      company = company
+      platforms = platform,
+      genres = genre,
+      universes = universe,
+      companies = company,
+      igdbId = 10919, // TODO: last few values are placeholder
+      releaseDate = Date(182),
+      images = listOf("er")
     )
     gameRepository.save(game)
     return game

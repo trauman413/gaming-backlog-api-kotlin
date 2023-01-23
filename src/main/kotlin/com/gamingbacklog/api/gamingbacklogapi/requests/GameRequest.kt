@@ -5,9 +5,9 @@ package com.gamingbacklog.api.gamingbacklogapi.requests
  */
 class GameRequest(
   var name: String,
-  var platform: String?,
-  var genre: String?,
-  var universe: String?,
-  var company: String?
+  var platform: List<String>?,
+  var genre: List<String>?,
+  var universe: List<String>?,
+  var company: List<String>?
 ) : Request() {
 }

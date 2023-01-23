@@ -69,7 +69,7 @@ class IGDBClient {
     } catch (ex: Exception) {
       ex.printStackTrace()
     }
-    val blank = IGDBGame(0, emptyArray(), emptyArray(), emptyArray(), emptyArray(), "", emptyArray(), emptyArray(), "")
+    val blank = IGDBGame(0, emptyList(), emptyList(), emptyList(), emptyList(), "", emptyList(), emptyList(), "")
     return arrayOf(blank)
   }
 
