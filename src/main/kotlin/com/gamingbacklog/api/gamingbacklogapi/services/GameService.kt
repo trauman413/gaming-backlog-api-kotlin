@@ -16,7 +16,7 @@ class GameService(
     return gameRepository.findAll()
   }
 
-  override fun getSingle(id: String): Game {
+  override fun getSingle(id: String): Game? {
     return gameRepository.findOneById(ObjectId(id))
   }
 

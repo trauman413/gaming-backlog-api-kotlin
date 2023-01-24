@@ -5,7 +5,7 @@ import org.bson.types.ObjectId
 import org.springframework.data.mongodb.repository.MongoRepository
 
 interface GameRepository: MongoRepository<Game, String> {
-  fun findOneById(id: ObjectId): Game
-  fun findByigdbId(igdbId: Long): Game
+  fun findOneById(id: ObjectId): Game?
+  fun findByigdbId(igdbId: Long): Game?
   override fun deleteAll()
 }
