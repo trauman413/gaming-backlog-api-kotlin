@@ -1,21 +1,14 @@
 package com.gamingbacklog.api.gamingbacklogapi.clients
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.gamingbacklog.api.gamingbacklogapi.models.Game
+import com.gamingbacklog.api.gamingbacklogapi.clients.util.ExternalAPIClient
 import com.gamingbacklog.api.gamingbacklogapi.models.igdb.Credentials
 import com.gamingbacklog.api.gamingbacklogapi.models.igdb.IGDBGame
 import com.google.gson.Gson
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
-import org.springframework.web.client.RestTemplate
-import java.net.URI
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
 
 @Component
-class IGDBClient(private val externalAPICall: ExternalAPICall) {
+class IGDBClient(private val externalAPIClient: ExternalAPIClient) {
 
   @Value("\${igdb.client.id}")
   val clientId: String = ""
@@ -31,7 +24,7 @@ class IGDBClient(private val externalAPICall: ExternalAPICall) {
    * Generates a token
    */
   fun authenticate(): Credentials {
-    val response = externalAPICall.postExternalCall(
+    val response = externalAPIClient.postExternalCall(
       "$authUri?client_id=$clientId&client_secret=$clientSecret&grant_type=client_credentials"
     )
     return if (response.statusCode() == 200) {
@@ -56,7 +49,7 @@ class IGDBClient(private val externalAPICall: ExternalAPICall) {
     val headers = HashMap<String, String>()
     headers["Client-ID"] = clientId
     headers["Authorization"] = "Bearer $accessToken"
-    val response = externalAPICall.postExternalCall("${baseUri}games/", body, headers)
+    val response = externalAPIClient.postExternalCall("${baseUri}games/", body, headers)
     return if (response.statusCode() == 200 && response.body() != "[]") {
       Gson().fromJson(response.body(), Array<IGDBGame>::class.java)
     } else {

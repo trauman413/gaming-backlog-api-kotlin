@@ -1,6 +1,8 @@
-package com.gamingbacklog.api.gamingbacklogapi.clients
+package com.gamingbacklog.api.gamingbacklogapi.unit.clients
 
-import com.gamingbacklog.api.gamingbacklogapi.testutil.models.MockResponse
+import com.gamingbacklog.api.gamingbacklogapi.clients.IGDBClient
+import com.gamingbacklog.api.gamingbacklogapi.clients.util.ExternalAPIClient
+import com.gamingbacklog.api.gamingbacklogapi.unit.testutil.models.MockResponse
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -19,13 +21,13 @@ import org.mockito.kotlin.eq
 @Import(IGDBClient::class)
 @TestPropertySource(properties = ["CLIENT_ID=test_id", "CLIENT_SECRET=test_secret"])
 class IGDBClientTests {
-  lateinit var externalAPICall: ExternalAPICall
+  lateinit var externalAPIClient: ExternalAPIClient
   lateinit var igdbClient: IGDBClient
 
   @BeforeEach
   fun configureSystem() {
-    externalAPICall = mock(ExternalAPICall::class.java)
-    igdbClient = IGDBClient(externalAPICall)
+    externalAPIClient = mock(ExternalAPIClient::class.java)
+    igdbClient = IGDBClient(externalAPIClient)
   }
 
   @Nested
@@ -34,11 +36,12 @@ class IGDBClientTests {
 
     @Test
     fun shouldSuccessfullyReturnToken() {
-      given(externalAPICall.postExternalCall(any(), eq(null), eq(null))).willReturn(
+      given(externalAPIClient.postExternalCall(any(), eq(null), eq(null))).willReturn(
         MockResponse(
           "{\"access_token\":\"test_secret\",\"expires_in\":5180593,\"token_type\":\"bearer\"}",
           200
-      ))
+      )
+      )
       val result = igdbClient.authenticate()
       Assertions.assertEquals("test_secret", result.access_token)
       Assertions.assertEquals("5180593", result.expires_in)
@@ -47,7 +50,7 @@ class IGDBClientTests {
 
     @Test
     fun shouldErrorOnAuthentication() {
-      given(externalAPICall.postExternalCall(any(), eq(null), eq(null))).willReturn(
+      given(externalAPIClient.postExternalCall(any(), eq(null), eq(null))).willReturn(
         MockResponse(
           "{\"status\":400,\"message\":\"invalid\"}",
           400
@@ -66,7 +69,7 @@ class IGDBClientTests {
     // successful return of game
     @Test
     fun shouldSuccessfullyReturnGame() {
-      given(externalAPICall.postExternalCall(any(), any(), any())).willReturn(
+      given(externalAPIClient.postExternalCall(any(), any(), any())).willReturn(
         MockResponse(
           "[\n" +
             "  {\n" +
@@ -126,7 +129,8 @@ class IGDBClientTests {
             "  }\n" +
             "]",
           200
-        ))
+        )
+      )
       val result = igdbClient.gamesRequest("test_secret", "191")
       Assertions.assertEquals(result[0].id, 191411)
       Assertions.assertEquals(result[0].artworks[0].url, "//images.igdb.com/igdb/image/upload/t_thumb/ar1lkx.jpg")
@@ -141,7 +145,8 @@ class IGDBClientTests {
     }
     @Test
     fun shouldReturnError() {
-      given(externalAPICall.postExternalCall(any(), any(), any())).willReturn(MockResponse(
+      given(externalAPIClient.postExternalCall(any(), any(), any())).willReturn(
+        MockResponse(
         "Status Code: 400, Error: [\n" +
           "  {\n" +
           "    \"title\": \"Syntax Error\",\n" +
@@ -149,7 +154,8 @@ class IGDBClientTests {
           "  }\n" +
           "]",
         400
-      ))
+      )
+      )
       val result = igdbClient.gamesRequest("test_secret", "000")
       Assertions.assertEquals(result[0].name, "")
       Assertions.assertEquals(result[0].summary, "")
@@ -157,10 +163,12 @@ class IGDBClientTests {
 
     @Test
     fun shouldReturnEmptyFor404() {
-      given(externalAPICall.postExternalCall(any(), any(), any())).willReturn(MockResponse(
+      given(externalAPIClient.postExternalCall(any(), any(), any())).willReturn(
+        MockResponse(
         "[]",
         404
-      ))
+      )
+      )
       val result = igdbClient.gamesRequest("test_secret", "1i93837189")
       Assertions.assertEquals(result[0].name, "")
       Assertions.assertEquals(result[0].summary, "")

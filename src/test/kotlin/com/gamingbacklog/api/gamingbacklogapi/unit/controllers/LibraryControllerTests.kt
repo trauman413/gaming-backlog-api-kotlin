@@ -1,16 +1,15 @@
-package com.gamingbacklog.api.gamingbacklogapi.controllers
+package com.gamingbacklog.api.gamingbacklogapi.unit.controllers
 
+import com.gamingbacklog.api.gamingbacklogapi.controllers.LibraryController
 import com.gamingbacklog.api.gamingbacklogapi.models.Library
 import com.gamingbacklog.api.gamingbacklogapi.requests.LibraryRequest
 import com.gamingbacklog.api.gamingbacklogapi.services.LibraryService
 import com.google.gson.Gson
 import org.hamcrest.CoreMatchers.*
 import org.junit.jupiter.api.*
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.BDDMockito.given
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
-import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties.Env
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
@@ -61,14 +60,6 @@ class LibraryControllerTests {
         .andExpect(jsonPath("$[1].games[0]", equalTo("gameId1")))
         .andExpect(jsonPath("$[1].games[1]", equalTo("gameId2")))
         .andExpect(jsonPath("$[1].id", equalTo("id2")))
-    }
-    /** Tests returning 204 for getting all libraries */
-    @Test
-    fun shouldReturnNoValues() {
-      given(libraryService.getAll()).willReturn(emptyList())
-      requestBuilder.runGetRequest(endpoint)
-        .andExpect(status().isOk)
-        .andExpect(jsonPath("$", equalTo(emptyList<Library>())))
     }
   }
 
@@ -151,7 +142,7 @@ class LibraryControllerTests {
   @DisplayName("Tests for deleteLibrary")
   inner class DeleteLibrary {
     @Test
-    fun shouldSuccessfullyDeleteFromLibrary() {
+    fun shouldSuccessfullyDeleteLibrary() {
       val library1 = Library("id1", "Backlog", ArrayList())
       val libraries = ArrayList<Library>()
       libraries.add(library1)

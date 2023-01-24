@@ -1,4 +1,4 @@
-package com.gamingbacklog.api.gamingbacklogapi.testutil.models
+package com.gamingbacklog.api.gamingbacklogapi.unit.testutil.models
 
 import java.net.URI
 import java.net.http.HttpClient
@@ -18,16 +18,16 @@ class MockResponse(
     return status
   }
 
-  override fun request(): HttpRequest {
-    TODO("Not yet implemented")
+  override fun request(): HttpRequest? {
+    return null
   }
 
   override fun previousResponse(): Optional<HttpResponse<String>> {
-    TODO("Not yet implemented")
+    return Optional.empty()
   }
 
-  override fun headers(): HttpHeaders {
-    TODO("Not yet implemented")
+  override fun headers(): HttpHeaders? {
+    return null
   }
 
   override fun body(): String {
@@ -35,14 +35,14 @@ class MockResponse(
   }
 
   override fun sslSession(): Optional<SSLSession> {
-    TODO("Not yet implemented")
+    return Optional.empty()
   }
 
-  override fun uri(): URI {
-    TODO("Not yet implemented")
+  override fun uri(): URI? {
+    return null
   }
 
-  override fun version(): HttpClient.Version {
-    TODO("Not yet implemented")
+  override fun version(): HttpClient.Version? {
+    return null
   }
 }

@@ -1,6 +1,5 @@
-package com.gamingbacklog.api.gamingbacklogapi.clients
+package com.gamingbacklog.api.gamingbacklogapi.clients.util
 
-import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
 import java.net.URI
 import java.net.http.HttpClient
@@ -8,7 +7,7 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
 @Component
-class ExternalAPICall {
+class ExternalAPIClient {
   fun postExternalCall(
     uri: String,
     body: String? = null,
