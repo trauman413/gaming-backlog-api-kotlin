@@ -122,7 +122,7 @@ class LibraryControllerTests {
 
   @Nested
   @DisplayName("Tests for addToLibrary")
-  // TODO: update tests when master library functionality is complete
+  // TODO: update tests when master library functionality is complete -- part of https://gaming-backlog.atlassian.net/browse/GB-39
   inner class AddToLibrary {
     @Test
     fun shouldSuccessfullyAddToLibrary() {

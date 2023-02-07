@@ -2,6 +2,7 @@ package com.gamingbacklog.api.gamingbacklogapi.unit.clients
 
 import com.gamingbacklog.api.gamingbacklogapi.clients.IGDBClient
 import com.gamingbacklog.api.gamingbacklogapi.clients.util.ExternalAPIClient
+import com.gamingbacklog.api.gamingbacklogapi.unit.testutil.constants.ResponseConstants
 import com.gamingbacklog.api.gamingbacklogapi.unit.testutil.models.MockResponse
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -21,14 +22,8 @@ import org.mockito.kotlin.eq
 @Import(IGDBClient::class)
 @TestPropertySource(properties = ["CLIENT_ID=test_id", "CLIENT_SECRET=test_secret"])
 class IGDBClientTests {
-  lateinit var externalAPIClient: ExternalAPIClient
-  lateinit var igdbClient: IGDBClient
-
-  @BeforeEach
-  fun configureSystem() {
-    externalAPIClient = mock(ExternalAPIClient::class.java)
-    igdbClient = IGDBClient(externalAPIClient)
-  }
+  var externalAPIClient: ExternalAPIClient = mock(ExternalAPIClient::class.java)
+  var igdbClient: IGDBClient = IGDBClient(externalAPIClient)
 
   @Nested
   @DisplayName("Tests for Authenticate")
@@ -38,7 +33,7 @@ class IGDBClientTests {
     fun shouldSuccessfullyReturnToken() {
       given(externalAPIClient.postExternalCall(any(), eq(null), eq(null))).willReturn(
         MockResponse(
-          "{\"access_token\":\"test_secret\",\"expires_in\":5180593,\"token_type\":\"bearer\"}",
+          ResponseConstants.mockIGDBAuthValidResponse,
           200
       )
       )
@@ -49,10 +44,10 @@ class IGDBClientTests {
     }
 
     @Test
-    fun shouldErrorOnAuthentication() {
+    fun shouldErrorOnInvalidAuthentication() {
       given(externalAPIClient.postExternalCall(any(), eq(null), eq(null))).willReturn(
         MockResponse(
-          "{\"status\":400,\"message\":\"invalid\"}",
+          ResponseConstants.mockIGDBAuth400Response,
           400
         )
       )
@@ -71,63 +66,7 @@ class IGDBClientTests {
     fun shouldSuccessfullyReturnGame() {
       given(externalAPIClient.postExternalCall(any(), any(), any())).willReturn(
         MockResponse(
-          "[\n" +
-            "  {\n" +
-            "    \"id\": 191411,\n" +
-            "    \"artworks\": [\n" +
-            "      {\n" +
-            "        \"id\": 74625,\n" +
-            "        \"url\": \"//images.igdb.com/igdb/image/upload/t_thumb/ar1lkx.jpg\"\n" +
-            "      }\n" +
-            "    ],\n" +
-            "    \"franchises\": [\n" +
-            "      {\n" +
-            "        \"id\": 1932,\n" +
-            "        \"name\": \"Xenoblade\"\n" +
-            "      }\n" +
-            "    ],\n" +
-            "    \"genres\": [\n" +
-            "      {\n" +
-            "        \"id\": 12,\n" +
-            "        \"name\": \"Role-playing (RPG)\"\n" +
-            "      },\n" +
-            "      {\n" +
-            "        \"id\": 31,\n" +
-            "        \"name\": \"Adventure\"\n" +
-            "      }\n" +
-            "    ],\n" +
-            "    \"involved_companies\": [\n" +
-            "      {\n" +
-            "        \"id\": 163667,\n" +
-            "        \"company\": {\n" +
-            "          \"id\": 1119,\n" +
-            "          \"name\": \"Monolith Soft\"\n" +
-            "        }\n" +
-            "      },\n" +
-            "      {\n" +
-            "        \"id\": 163668,\n" +
-            "        \"company\": {\n" +
-            "          \"id\": 70,\n" +
-            "          \"name\": \"Nintendo\"\n" +
-            "        }\n" +
-            "      }\n" +
-            "    ],\n" +
-            "    \"name\": \"Xenoblade Chronicles 3\",\n" +
-            "    \"platforms\": [\n" +
-            "      {\n" +
-            "        \"id\": 130,\n" +
-            "        \"name\": \"Nintendo Switch\"\n" +
-            "      }\n" +
-            "    ],\n" +
-            "    \"release_dates\": [\n" +
-            "      {\n" +
-            "        \"id\": 354757,\n" +
-            "        \"human\": \"Jul 29, 2022\"\n" +
-            "      }\n" +
-            "    ],\n" +
-            "    \"summary\": \"Eunie's the bussss\"\n" +
-            "  }\n" +
-            "]",
+          ResponseConstants.mockIGDBGetGame200Response,
           200
         )
       )
@@ -144,15 +83,10 @@ class IGDBClientTests {
       Assertions.assertEquals(result[0].summary, "Eunie's the bussss")
     }
     @Test
-    fun shouldReturnError() {
+    fun shouldReturn400SyntaxError() {
       given(externalAPIClient.postExternalCall(any(), any(), any())).willReturn(
         MockResponse(
-        "Status Code: 400, Error: [\n" +
-          "  {\n" +
-          "    \"title\": \"Syntax Error\",\n" +
-          "    \"status\": 400\n" +
-          "  }\n" +
-          "]",
+        ResponseConstants.mockIGDBGetGame400Response,
         400
       )
       )
@@ -162,7 +96,7 @@ class IGDBClientTests {
     }
 
     @Test
-    fun shouldReturnEmptyFor404() {
+    fun shouldReturnEmptyFor404Error() {
       given(externalAPIClient.postExternalCall(any(), any(), any())).willReturn(
         MockResponse(
         "[]",
