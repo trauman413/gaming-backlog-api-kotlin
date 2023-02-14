@@ -30,7 +30,6 @@ class GameInstanceController(
    * Returns a single game instance based on an id
    * @param id  A given game ID
    *
-   * @TODO this will likely not be present in long-term
    */
   @GetMapping("/{id}")
   fun getSingleGame(

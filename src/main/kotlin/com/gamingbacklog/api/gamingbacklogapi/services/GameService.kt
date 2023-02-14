@@ -1,16 +1,21 @@
 package com.gamingbacklog.api.gamingbacklogapi.services
 
 import com.gamingbacklog.api.gamingbacklogapi.models.Game
+import com.gamingbacklog.api.gamingbacklogapi.models.igdb.CompanyFieldInfo
+import com.gamingbacklog.api.gamingbacklogapi.models.igdb.FieldInfo
+import com.gamingbacklog.api.gamingbacklogapi.models.igdb.IGDBGame
 import com.gamingbacklog.api.gamingbacklogapi.repositories.GameRepository
 import com.gamingbacklog.api.gamingbacklogapi.requests.GameRequest
 import com.gamingbacklog.api.gamingbacklogapi.requests.Request
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import java.util.*
+import kotlin.collections.ArrayList
 
 @Service
 class GameService(
-  private val gameRepository: GameRepository
+  private val gameRepository: GameRepository,
+
 ) : IService<Game> {
   override fun getAll(): List<Game> {
     return gameRepository.findAll()
@@ -47,4 +52,29 @@ class GameService(
   override fun update(model: Game) {
     gameRepository.save(model)
   }
+
+//  fun igdbGameToGame(igdbGame: IGDBGame): Game {
+//    // TODO: implement
+//
+//    return Game(
+//      name = igdbGame.name,
+//      platforms = extractFieldInfo(igdbGame.platforms),
+//      genres = extractFieldInfo(igdbGame.genres),
+//      companies =
+//
+//    )
+//    return Game()
+//  }
+
+  fun extractFieldInfo(igdbProperties: List<FieldInfo>): List<String> {
+    val fields = ArrayList<String>()
+    for (field in igdbProperties) {
+      fields.add(field.name)
+    }
+    return fields
+  }
+
+//  fun extractCompanyFieldInfo(companies: List<CompanyFieldInfo>): List<String> {
+//    companies.map {  }
+//  }
 }

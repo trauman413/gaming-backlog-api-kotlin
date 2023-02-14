@@ -1,14 +1,10 @@
 package com.gamingbacklog.api.gamingbacklogapi.clients
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.gamingbacklog.api.gamingbacklogapi.models.Game
 import com.gamingbacklog.api.gamingbacklogapi.models.igdb.Credentials
 import com.gamingbacklog.api.gamingbacklogapi.models.igdb.IGDBGame
 import com.google.gson.Gson
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
-import org.springframework.web.client.RestTemplate
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest

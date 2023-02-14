@@ -6,18 +6,19 @@ import lombok.NoArgsConstructor
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
+import org.springframework.data.mongodb.core.mapping.Field
 import java.util.*
 
 @Document("gameInstances")
 @NoArgsConstructor
 @Data
-@AllArgsConstructor
 data class GameInstance(
   @Id
   val id: String = ObjectId.get().toString(),
 
   // igdb-specific data
-  val igdbId: Long,
+  @Field
+  val igdbId: String,
   val name: String,
   val platforms: List<String>,
   val genres: List<String>, // TODO: make these enums potentially
@@ -27,11 +28,11 @@ data class GameInstance(
   val images: List<String>,
 
   // user-custom data
-  val rating: Int?,
-  val review: String?,
-  val ranking: String?,
-  val yearPlayed: Int?,
-  val yearReceived: Int?,
-  val notes: String?,
-  val platformsOwnedOn: List<String>?
+  var rating: Int? = null,
+  var review: String? = null,
+  var ranking: String? = null,
+  val yearPlayed: Int? = null,
+  var yearReceived: Int? = null,
+  var notes: String? = null,
+  var platformsOwnedOn: List<String>? = null
   )

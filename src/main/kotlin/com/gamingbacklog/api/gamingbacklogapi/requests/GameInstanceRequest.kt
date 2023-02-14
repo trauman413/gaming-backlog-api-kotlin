@@ -3,7 +3,7 @@ package com.gamingbacklog.api.gamingbacklogapi.requests
 import java.util.*
 
 class GameInstanceRequest(
-  var igdbId: Long,
+  var igdbId: String,
   var name: String,
   var platforms: List<String>,
   var genres: List<String>,
