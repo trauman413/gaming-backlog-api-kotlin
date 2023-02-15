@@ -44,7 +44,6 @@ class LibraryController(private val libraryService: LibraryService) {
     return ResponseEntity.ok("Successfully added game to library")
   }
 
-  // TODO: add getGameFromLibrary here
   @GetMapping("/{id}/games/{gameId}")
   fun getGameFromLibrary(
     @PathVariable("id") libraryId: String,
