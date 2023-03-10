@@ -4,8 +4,8 @@ import com.gamingbacklog.api.gamingbacklogapi.models.Game
 import com.gamingbacklog.api.gamingbacklogapi.models.Library
 import com.gamingbacklog.api.gamingbacklogapi.repositories.GameRepository
 import com.gamingbacklog.api.gamingbacklogapi.repositories.LibraryRepository
-import com.gamingbacklog.api.gamingbacklogapi.requests.LibraryRequest
-import com.gamingbacklog.api.gamingbacklogapi.requests.Request
+import com.gamingbacklog.api.gamingbacklogapi.models.requests.LibraryRequest
+import com.gamingbacklog.api.gamingbacklogapi.models.requests.Request
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import java.util.ArrayList

@@ -4,7 +4,7 @@ import com.gamingbacklog.api.gamingbacklogapi.clients.IGDBClient
 import com.gamingbacklog.api.gamingbacklogapi.models.Game
 import com.gamingbacklog.api.gamingbacklogapi.models.igdb.Credentials
 import com.gamingbacklog.api.gamingbacklogapi.models.igdb.IGDBGame
-import com.gamingbacklog.api.gamingbacklogapi.requests.GameRequest
+import com.gamingbacklog.api.gamingbacklogapi.models.requests.GameRequest
 import com.gamingbacklog.api.gamingbacklogapi.services.GameService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

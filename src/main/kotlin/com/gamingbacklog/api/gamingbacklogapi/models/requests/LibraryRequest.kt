@@ -1,4 +1,4 @@
-package com.gamingbacklog.api.gamingbacklogapi.requests
+package com.gamingbacklog.api.gamingbacklogapi.models.requests
 
 class LibraryRequest (
   var name: String,

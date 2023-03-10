@@ -2,8 +2,8 @@ package com.gamingbacklog.api.gamingbacklogapi.services
 
 import com.gamingbacklog.api.gamingbacklogapi.models.Game
 import com.gamingbacklog.api.gamingbacklogapi.repositories.GameRepository
-import com.gamingbacklog.api.gamingbacklogapi.requests.GameRequest
-import com.gamingbacklog.api.gamingbacklogapi.requests.Request
+import com.gamingbacklog.api.gamingbacklogapi.models.requests.GameRequest
+import com.gamingbacklog.api.gamingbacklogapi.models.requests.Request
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 

@@ -2,7 +2,9 @@ package com.gamingbacklog.api.gamingbacklogapi.controllers
 
 import com.gamingbacklog.api.gamingbacklogapi.models.Game
 import com.gamingbacklog.api.gamingbacklogapi.models.Library
-import com.gamingbacklog.api.gamingbacklogapi.requests.LibraryRequest
+import com.gamingbacklog.api.gamingbacklogapi.models.requests.LibraryRequest
+import com.gamingbacklog.api.gamingbacklogapi.models.responses.GameResponse
+import com.gamingbacklog.api.gamingbacklogapi.models.responses.LibraryResponse
 import com.gamingbacklog.api.gamingbacklogapi.services.LibraryService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -12,10 +14,30 @@ import java.util.*
 @RestController
 @RequestMapping("/libraries")
 class LibraryController(private val libraryService: LibraryService) {
-  @GetMapping("/")
-  fun getLibraries(): ResponseEntity<List<Library>> {
+  @GetMapping("/all")
+  fun getAllLibraries(): ResponseEntity<List<Library>> {
     val libraries = libraryService.getAll()
     return ResponseEntity.ok(libraries)
+  }
+
+  @CrossOrigin(origins = ["http://localhost:3000"])
+  @GetMapping("/")
+  fun getAllLibrariesWithGames(): ResponseEntity<List<LibraryResponse>> {
+    val libraries = libraryService.getAll()
+    // Needed for the frontend. Should refactor this and the one above + tests depending on what we need.
+    val librariesWithGames: List<LibraryResponse> = libraries.map { library -> convertLibraryToResponse(library) }
+    return ResponseEntity.ok(librariesWithGames)
+  }
+
+  private fun convertLibraryToResponse(library: Library): LibraryResponse {
+    if (library.games.size > 0) {
+      val games: List<Game> = library.games.map { gameId -> libraryService.getGameFromLibrary(library.id, gameId)!! }
+      val gameResponses = games.map { game -> GameResponse(game.id, game.name) }
+      return LibraryResponse(id = library.id, name = library.name, games = gameResponses)
+    } else {
+      // TODO: Do we want to allow empty libraries?
+      return LibraryResponse(id = library.id, name = library.name, games = emptyList());
+    }
   }
 
   @GetMapping("/{id}")

@@ -1,6 +1,6 @@
 package com.gamingbacklog.api.gamingbacklogapi.services
 
-import com.gamingbacklog.api.gamingbacklogapi.requests.Request
+import com.gamingbacklog.api.gamingbacklogapi.models.requests.Request
 
 interface IService<T> {
   fun getAll(): List<T>

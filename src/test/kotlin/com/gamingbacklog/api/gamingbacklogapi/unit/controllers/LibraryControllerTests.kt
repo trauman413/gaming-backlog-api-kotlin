@@ -2,7 +2,7 @@ package com.gamingbacklog.api.gamingbacklogapi.unit.controllers
 
 import com.gamingbacklog.api.gamingbacklogapi.controllers.LibraryController
 import com.gamingbacklog.api.gamingbacklogapi.models.Library
-import com.gamingbacklog.api.gamingbacklogapi.requests.LibraryRequest
+import com.gamingbacklog.api.gamingbacklogapi.models.requests.LibraryRequest
 import com.gamingbacklog.api.gamingbacklogapi.services.LibraryService
 import com.google.gson.Gson
 import org.hamcrest.CoreMatchers.*
@@ -51,7 +51,7 @@ class LibraryControllerTests {
       libraries.add(library1)
       libraries.add(library2)
       given(libraryService.getAll()).willReturn(libraries)
-      requestBuilder.runGetRequest(endpoint)
+      requestBuilder.runGetRequest(endpoint+"all/")
         .andExpect(status().isOk)
         .andExpect(jsonPath("$[0].name", equalTo("Backlog")))
         .andExpect(jsonPath("$[0].games", equalToObject(ArrayList<String>())))
@@ -62,6 +62,8 @@ class LibraryControllerTests {
         .andExpect(jsonPath("$[1].id", equalTo("id2")))
     }
   }
+
+  // TODO: Tests for getAllLibrariesWithGames
 
   @Nested
   @DisplayName("Tests for getSingleLibrary")

@@ -1,4 +1,4 @@
-package com.gamingbacklog.api.gamingbacklogapi.requests
+package com.gamingbacklog.api.gamingbacklogapi.models.requests
 
 /**
  * TODO: this will be heavily modified/refactored
