@@ -5,16 +5,15 @@ import com.gamingbacklog.api.gamingbacklogapi.models.GameInstance
 import com.gamingbacklog.api.gamingbacklogapi.repositories.GameInstanceRepository
 import com.gamingbacklog.api.gamingbacklogapi.repositories.GameRepository
 import com.gamingbacklog.api.gamingbacklogapi.requests.GameInstanceRequest
+import com.gamingbacklog.api.gamingbacklogapi.requests.GameRequest
 import com.gamingbacklog.api.gamingbacklogapi.requests.Request
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 
 @Service
 class GameInstanceService(
-  // TODO: refactor --> this should call gameService and do the igdb calls from there, also potentially gameRepository calls from there too
   private val gameInstanceRepository: GameInstanceRepository,
-  private val gameRepository: GameRepository,
-  private val igdbClient: IGDBClient
+  private val gameService: GameService
 ) : IService<GameInstance> {
   override fun getAll(): List<GameInstance> {
     return gameInstanceRepository.findAll()
@@ -25,18 +24,11 @@ class GameInstanceService(
   }
 
   override fun create(request: Request): GameInstance {
-    /**
-     * 1) Get igdbID
-     * 2) Search GameDB for igdbID
-     * 3) If it is there, get info from there
-     * 4) If it is not there, call igdb API and get info and add to GameDB
-     * 5) Use info to populate new GameInstance
-     */
     val gameInstanceRequest = request as GameInstanceRequest
-    val igdbId = gameInstanceRequest.igdbId
-    val game = gameRepository.findByigdbId(igdbId)
+    val igdbId = gameInstanceRequest.igdbId!! // TODO: GB-55 error handling
+    var game = gameService.getByIGDBId(igdbId)
     if (game != null) {
-      return GameInstance(
+      val gameInstance = GameInstance(
         igdbId = igdbId,
         name = game.name,
         platforms = game.platforms,
@@ -46,11 +38,23 @@ class GameInstanceService(
         releaseDate = game.releaseDate,
         images = game.images
       )
+      gameInstanceRepository.save(gameInstance)
+      return gameInstance
     }
-    val igdbGame = igdbClient.gamesRequest(igdbClient.authenticate().access_token, igdbId)
-    //gameRepository.save()
-
-
+    // if no game is found, call IGDB Client
+    game = gameService.create(GameRequest(igdbId))
+    val gameInstance = GameInstance(
+      igdbId = igdbId,
+      name = game.name,
+      platforms = game.platforms,
+      genres = game.genres,
+      universes = game.universes,
+      companies = game.companies,
+      releaseDate = game.releaseDate,
+      images = game.images
+    )
+    gameInstanceRepository.save(gameInstance)
+    return gameInstance
   }
 
   override fun delete(id: String) {
@@ -60,4 +64,18 @@ class GameInstanceService(
   override fun update(model: GameInstance) {
     gameInstanceRepository.save(model)
   }
+
+  fun updateWithCustomFields(gameId: String, request: GameInstanceRequest) {
+    val gameInstance = gameInstanceRepository.findOneById(ObjectId(gameId))
+    if (request.rating != null) gameInstance?.rating = request.rating
+    if (request.review != null) gameInstance?.review = request.review
+    if (request.ranking != null) gameInstance?.ranking = request.ranking
+    if (request.yearPlayed != null) gameInstance?.yearPlayed = request.yearPlayed
+    if (request.yearReceived != null) gameInstance?.yearReceived = request.yearReceived
+    if (request.notes != null) gameInstance?.notes = request.notes
+    if (request.platformsOwnedOn != null) gameInstance?.platformsOwnedOn = request.platformsOwnedOn
+    update(gameInstance!!)
+  }
+
+
 }

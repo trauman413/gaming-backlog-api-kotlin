@@ -1,6 +1,5 @@
 package com.gamingbacklog.api.gamingbacklogapi.models
 
-import lombok.AllArgsConstructor
 import lombok.Data
 import lombok.NoArgsConstructor
 import org.bson.types.ObjectId
@@ -21,17 +20,17 @@ data class GameInstance(
   val igdbId: String,
   val name: String,
   val platforms: List<String>,
-  val genres: List<String>, // TODO: make these enums potentially
+  val genres: List<String>,
   val universes: List<String>,
   val companies: List<String>,
-  val releaseDate: Date,
+  val releaseDate: List<String>,
   val images: List<String>,
 
   // user-custom data
   var rating: Int? = null,
   var review: String? = null,
   var ranking: String? = null,
-  val yearPlayed: Int? = null,
+  var yearPlayed: Int? = null,
   var yearReceived: Int? = null,
   var notes: String? = null,
   var platformsOwnedOn: List<String>? = null

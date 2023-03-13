@@ -8,14 +8,10 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
-// TODO: will need to work out that we need some storage for Games. Games need to exist so we don't make a million calls to IGDB
-// see OneNote
-
 @RestController
-@RequestMapping("/gameinstance")
+@RequestMapping("/gameinstances")
 class GameInstanceController(
   private val gameInstanceService: GameInstanceService,
-  private val igdbClient: IGDBClient
 ) {
   /**
    * Returns all the existing game instances
@@ -32,7 +28,7 @@ class GameInstanceController(
    *
    */
   @GetMapping("/{id}")
-  fun getSingleGame(
+  fun getSingleGameInstance(
     @PathVariable("id") id: String
   ): ResponseEntity<GameInstance> {
     val game = gameInstanceService.getSingle(id)
@@ -40,16 +36,40 @@ class GameInstanceController(
   }
 
   /**
-   * Creates a new game
-   * @param gameRequest The game to be created
-   *
+   * Creates a new game instance
+   * @param gameRequest The game instance to be created
    */
   @PostMapping("/")
-  fun createGame(
+  fun createGameInstance(
     @RequestBody gameRequest: GameInstanceRequest
   ): ResponseEntity<GameInstance> {
-    // TODO: may need to be massively changed
     val game = gameInstanceService.create(gameRequest)
     return ResponseEntity<GameInstance>(game, HttpStatus.CREATED)
+  }
+
+  /**
+   * Updates a game with user-specified fields
+   * @param id  A given game ID
+   * @param gameRequest   The request with fields to be updated
+   */
+  @PutMapping("/{id}")
+  fun updateGameInstance(
+    @PathVariable("id") id: String,
+    @RequestBody gameRequest: GameInstanceRequest
+  ): ResponseEntity<String> {
+    gameInstanceService.updateWithCustomFields(id, gameRequest)
+    return ResponseEntity.ok("Successfully added custom fields")
+  }
+
+  /**
+   * Deletes a game instance
+   * @param id A given game instance ID
+   */
+  @DeleteMapping("/{id}")
+  fun deleteGameInstance(
+    @PathVariable("id") id: String
+  ): ResponseEntity<String> {
+    gameInstanceService.delete(id)
+    return ResponseEntity.ok("Successfully deleted game instance $id")
   }
 }

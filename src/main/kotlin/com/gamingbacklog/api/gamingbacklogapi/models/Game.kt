@@ -12,16 +12,16 @@ import java.util.*
 @NoArgsConstructor
 @Data
 @AllArgsConstructor
-data class Game (
+data class Game(
   @Id
   val id: String = ObjectId.get().toString(),
-  val igdbId: Long,
+  val igdbId: String,
   val name: String,
   val platforms: List<String>,
-  val genres: List<String>, // TODO: make these enums potentially
+  val genres: List<String>,
   val universes: List<String>,
   val companies: List<String>,
-  val releaseDate: Date,
+  val releaseDate: List<String>,
   val images: List<String>,
 
   )

@@ -1,6 +1,6 @@
 package com.gamingbacklog.api.gamingbacklogapi.controllers
 
-import com.gamingbacklog.api.gamingbacklogapi.models.Game
+import com.gamingbacklog.api.gamingbacklogapi.models.GameInstance
 import com.gamingbacklog.api.gamingbacklogapi.models.Library
 import com.gamingbacklog.api.gamingbacklogapi.requests.LibraryRequest
 import com.gamingbacklog.api.gamingbacklogapi.services.LibraryService
@@ -44,15 +44,14 @@ class LibraryController(private val libraryService: LibraryService) {
     return ResponseEntity.ok("Successfully added game to library")
   }
 
-  // TODO: add getGameFromLibrary here
   @GetMapping("/{id}/games/{gameId}")
   fun getGameFromLibrary(
     @PathVariable("id") libraryId: String,
     @PathVariable("gameId") gameId: String
-  ): ResponseEntity<Game> {
+  ): ResponseEntity<GameInstance> {
     val game = libraryService.getGameFromLibrary(libraryId, gameId)
-      ?: return ResponseEntity<Game>( null, HttpStatus.NOT_FOUND)
-    return ResponseEntity<Game>(game, HttpStatus.OK)
+      ?: return ResponseEntity<GameInstance>( null, HttpStatus.NOT_FOUND)
+    return ResponseEntity<GameInstance>(game, HttpStatus.OK)
   }
 
   @DeleteMapping("/{id}")
