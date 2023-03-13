@@ -1,6 +1,8 @@
 package com.gamingbacklog.api.gamingbacklogapi.unit.controllers
 
 import com.gamingbacklog.api.gamingbacklogapi.controllers.LibraryController
+import com.gamingbacklog.api.gamingbacklogapi.models.Game
+import com.gamingbacklog.api.gamingbacklogapi.models.GameInstance
 import com.gamingbacklog.api.gamingbacklogapi.models.Library
 import com.gamingbacklog.api.gamingbacklogapi.requests.LibraryRequest
 import com.gamingbacklog.api.gamingbacklogapi.services.LibraryService
@@ -40,7 +42,6 @@ class LibraryControllerTests {
   @Nested
   @DisplayName("Tests for getLibraries")
   inner class GetLibraries {
-    /** Tests returning a 200 response for returning all libraries */
     @Test
     fun shouldReturnAllLibraries() {
       val library1 = Library("id1", "Backlog", ArrayList())
@@ -66,7 +67,6 @@ class LibraryControllerTests {
   @Nested
   @DisplayName("Tests for getSingleLibrary")
   inner class GetSingleLibrary {
-    // returns 200
     @Test
     fun shouldReturnLibrarySuccessfully() {
       val library = Library(id1, "Owned Games", ArrayList())
@@ -81,7 +81,7 @@ class LibraryControllerTests {
         .andExpect(jsonPath("$.games[1]", equalTo("gameId2")))
         .andExpect(jsonPath("$.id", equalTo(id1)))
     }
-    // returns 404
+
     @Test
     fun shouldReturnNoLibrary() {
       given(libraryService.getSingle(any())).willReturn(null)
@@ -95,7 +95,6 @@ class LibraryControllerTests {
   @Nested
   @DisplayName("Tests for createLibrary")
   inner class CreateLibrary {
-    // creates library successfully
     @Test
     fun shouldSuccessfullyCreateLibraryWithNoGamesPassedIn() {
       val library = Library(id2, "Backlog", ArrayList())
@@ -122,7 +121,6 @@ class LibraryControllerTests {
 
   @Nested
   @DisplayName("Tests for addToLibrary")
-  // TODO: update tests when master library functionality is complete -- part of https://gaming-backlog.atlassian.net/browse/GB-39
   inner class AddToLibrary {
     @Test
     fun shouldSuccessfullyAddToLibrary() {
@@ -159,13 +157,41 @@ class LibraryControllerTests {
   @Nested
   @DisplayName("Tests for getGameFromLibrary")
   inner class GetGameFromLibrary {
-    // TODO: implement this after Game Instance is implemented
-    // get game successfully
-    // no game found
+    @Test
+    fun shouldGetGameFromLibrarySuccessfully() {
+      val library = Library("id1", "Backlog", ArrayList())
+      library.games.add("gameId1")
+      val game = GameInstance("gameId1", "19", "Fire Emblem: Engage",
+        arrayListOf("Nintendo Switch"), arrayListOf("RPG"), arrayListOf("Fire Emblem"), arrayListOf("Nintendo", "Intelligent Systems"),
+        arrayListOf("January 20 2023"), arrayListOf(""))
+      given(libraryService.getGameFromLibrary(any(), any())).willReturn(game)
+      endpoint += "$id1/games/${"gameId1"}"
+      requestBuilder.runGetRequest(endpoint)
+        .andExpect(status().isOk)
+        .andExpect(jsonPath("$.name", equalTo("Fire Emblem: Engage")))
+        .andExpect(jsonPath("$.igdbId", equalTo("19")))
+        .andExpect(jsonPath("$.platforms[0]", equalTo("Nintendo Switch")))
+        .andExpect(jsonPath("$.genres[0]", equalTo("RPG")))
+        .andExpect(jsonPath("$.universes[0]", equalTo("Fire Emblem")))
+        .andExpect(jsonPath("$.companies[0]", equalTo("Nintendo")))
+        .andExpect(jsonPath("$.companies[1]", equalTo("Intelligent Systems")))
+        .andExpect(jsonPath("$.releaseDate[0]", equalTo("January 20 2023")))
+        .andExpect(jsonPath("$.images[0]", equalTo("")))
+        .andExpect(jsonPath("$.id", equalTo("gameId1")))
+    }
+
+    @Test
+    fun shouldGetNotFoundForGameInLibrary() {
+      val library = Library("id1", "Backlog", ArrayList())
+      given(libraryService.getGameFromLibrary(any(), any())).willReturn(null)
+      endpoint += "$id1/games/${"gameId1"}"
+      requestBuilder.runGetRequest(endpoint)
+        .andExpect(status().isNotFound)
+        .andExpect(jsonPath("$").doesNotExist())
+    }
   }
 
   fun requestToString(request: LibraryRequest): String {
-    println(request.toString())
     return Gson().toJson(request)
   }
 

@@ -10,13 +10,13 @@ import lombok.NoArgsConstructor
 @AllArgsConstructor
 data class IGDBGame(
   val id: Long,
-  val artworks: Array<ArtworkInfo>,
-  val franchises: Array<FieldInfo>,
-  val genres: Array<FieldInfo>,
-  val involved_companies: Array<CompanyFieldInfo>,
+  val artworks: List<ArtworkInfo>,
+  val franchises: List<FieldInfo>,
+  val genres: List<FieldInfo>,
+  val involved_companies: List<CompanyFieldInfo>,
   val name: String,
-  val platforms: Array<FieldInfo>,
-  val release_dates: Array<ReleaseDate>,
+  val platforms: List<FieldInfo>,
+  val release_dates: List<ReleaseDate>,
   val summary: String
 ) {
 }
