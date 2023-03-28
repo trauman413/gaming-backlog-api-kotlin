@@ -12,6 +12,7 @@ import org.mockito.kotlin.*
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.TestPropertySource
+import java.util.*
 
 @SpringBootTest
 @Import(GameInstanceService::class)
@@ -41,14 +42,14 @@ class GameInstanceServiceTests {
     fun shouldCreateInstanceFromIdAlreadyInGameRepo() {
       given(gameService.getByIGDBId(any())).willReturn(foundGame)
       val result = gameInstanceService.create(request)
-      Assertions.assertEquals(foundGame.igdbId, result.igdbId)
-      Assertions.assertEquals(foundGame.name, result.name)
-      Assertions.assertEquals(foundGame.platforms, result.platforms)
-      Assertions.assertEquals(foundGame.genres, result.genres)
-      Assertions.assertEquals(foundGame.universes, result.universes)
-      Assertions.assertEquals(foundGame.companies, result.companies)
-      Assertions.assertEquals(foundGame.releaseDate, result.releaseDate)
-      Assertions.assertEquals(foundGame.images, result.images)
+      Assertions.assertEquals(foundGame.igdbId, result?.igdbId)
+      Assertions.assertEquals(foundGame.name, result?.name)
+      Assertions.assertEquals(foundGame.platforms, result?.platforms)
+      Assertions.assertEquals(foundGame.genres, result?.genres)
+      Assertions.assertEquals(foundGame.universes, result?.universes)
+      Assertions.assertEquals(foundGame.companies, result?.companies)
+      Assertions.assertEquals(foundGame.releaseDate, result?.releaseDate)
+      Assertions.assertEquals(foundGame.images, result?.images)
     }
     // id does not exist --> call igdb, create
     @Test
@@ -56,14 +57,14 @@ class GameInstanceServiceTests {
       given(gameService.getByIGDBId(any())).willReturn(null)
       given(gameService.create(any())).willReturn(foundGame)
       val result = gameInstanceService.create(request)
-      Assertions.assertEquals(foundGame.igdbId, result.igdbId)
-      Assertions.assertEquals(foundGame.name, result.name)
-      Assertions.assertEquals(foundGame.platforms, result.platforms)
-      Assertions.assertEquals(foundGame.genres, result.genres)
-      Assertions.assertEquals(foundGame.universes, result.universes)
-      Assertions.assertEquals(foundGame.companies, result.companies)
-      Assertions.assertEquals(foundGame.releaseDate, result.releaseDate)
-      Assertions.assertEquals(foundGame.images, result.images)
+      Assertions.assertEquals(foundGame.igdbId, result?.igdbId)
+      Assertions.assertEquals(foundGame.name, result?.name)
+      Assertions.assertEquals(foundGame.platforms, result?.platforms)
+      Assertions.assertEquals(foundGame.genres, result?.genres)
+      Assertions.assertEquals(foundGame.universes, result?.universes)
+      Assertions.assertEquals(foundGame.companies, result?.companies)
+      Assertions.assertEquals(foundGame.releaseDate, result?.releaseDate)
+      Assertions.assertEquals(foundGame.images, result?.images)
     }
   }
 

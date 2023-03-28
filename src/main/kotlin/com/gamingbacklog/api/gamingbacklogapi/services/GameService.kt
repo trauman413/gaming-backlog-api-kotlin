@@ -28,13 +28,18 @@ class GameService(
     return gameRepository.findByigdbId(igdbId)
   }
 
-  override fun create(request: Request): Game {
+  override fun create(request: Request): Game? {
     val gameRequest = request as GameRequest
     val igdbId = gameRequest.igdbID
-    val igdbGame = igdbClient.gamesRequest(igdbClient.authenticate().access_token, igdbId)
-    val game = igdbGameToGame(igdbGame[0])
-    gameRepository.save(game)
-    return game
+    return try {
+      val igdbGame = igdbClient.gamesRequest(igdbClient.authenticate().access_token, igdbId)
+      val game = igdbGameToGame(igdbGame[0])
+      gameRepository.save(game)
+      game
+    } catch (ex: Exception) {
+      println("Exception when calling IGDB ${ex.localizedMessage}")
+      null
+    }
   }
 
   override fun delete(id: String) {

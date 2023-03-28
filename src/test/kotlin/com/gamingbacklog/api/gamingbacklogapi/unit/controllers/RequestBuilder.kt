@@ -25,6 +25,13 @@ class RequestBuilder(private val mockMvc: MockMvc) {
     )
   }
 
+  fun runPatchRequest(url: String, request: String): ResultActions {
+    return mockMvc.perform(patch(url)
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(request)
+    )
+  }
+
   fun runDeleteRequest(url: String): ResultActions {
     return mockMvc.perform(delete(url))
   }

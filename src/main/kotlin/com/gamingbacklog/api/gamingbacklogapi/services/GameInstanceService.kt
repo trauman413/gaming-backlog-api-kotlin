@@ -9,6 +9,8 @@ import com.gamingbacklog.api.gamingbacklogapi.requests.GameRequest
 import com.gamingbacklog.api.gamingbacklogapi.requests.Request
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
+import java.time.LocalDate
+import java.util.*
 
 @Service
 class GameInstanceService(
@@ -23,7 +25,7 @@ class GameInstanceService(
     return gameInstanceRepository.findOneById(ObjectId(id))
   }
 
-  override fun create(request: Request): GameInstance {
+  override fun create(request: Request): GameInstance? {
     val gameInstanceRequest = request as GameInstanceRequest
     val igdbId = gameInstanceRequest.igdbId!! // TODO: GB-55 error handling
     var game = gameService.getByIGDBId(igdbId)
@@ -43,6 +45,9 @@ class GameInstanceService(
     }
     // if no game is found, call IGDB Client
     game = gameService.create(GameRequest(igdbId))
+    if (game == null) {
+      return null
+    }
     val gameInstance = GameInstance(
       igdbId = igdbId,
       name = game.name,
@@ -74,6 +79,7 @@ class GameInstanceService(
     if (request.yearReceived != null) gameInstance?.yearReceived = request.yearReceived
     if (request.notes != null) gameInstance?.notes = request.notes
     if (request.platformsOwnedOn != null) gameInstance?.platformsOwnedOn = request.platformsOwnedOn
+    gameInstance?.dateAdded = LocalDate.now()
     update(gameInstance!!)
   }
 

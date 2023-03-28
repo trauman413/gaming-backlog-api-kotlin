@@ -28,6 +28,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import java.util.*
+import kotlin.collections.ArrayList
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -147,7 +149,7 @@ class GameInstanceControllerTests {
   @Nested
   @DisplayName("Tests for updateGameInstance")
   inner class UpdateGameInstance {
-    fun setValues(gameInstanceRequest: GameInstanceRequest, game: GameInstance) {
+    private fun setValues(gameInstanceRequest: GameInstanceRequest, game: GameInstance) {
       if (gameInstanceRequest.rating != null) game.rating = gameInstanceRequest.rating
       if (gameInstanceRequest.review != null) game.review = gameInstanceRequest.review
       if (gameInstanceRequest.ranking != null) game.ranking = gameInstanceRequest.ranking
@@ -176,7 +178,7 @@ class GameInstanceControllerTests {
         setValues(gameInstanceRequest, game)
       }
       endpoint += "$id1/"
-      requestBuilder.runPutRequest(endpoint, requestToString(gameInstanceRequest))
+      requestBuilder.runPatchRequest(endpoint, requestToString(gameInstanceRequest))
         .andExpect(status().isOk)
       assertEquals(game.rating, gameInstanceRequest.rating)
       assertEquals(game.review, gameInstanceRequest.review)
@@ -208,7 +210,7 @@ class GameInstanceControllerTests {
         setValues(gameInstanceRequest, game)
       }
       endpoint += "$id1/"
-      requestBuilder.runPutRequest(endpoint, requestToString(gameInstanceRequest))
+      requestBuilder.runPatchRequest(endpoint, requestToString(gameInstanceRequest))
         .andExpect(status().isOk)
       assertEquals(game.rating, gameInstanceRequest.rating)
       assertEquals(game.review, gameInstanceRequest.review)

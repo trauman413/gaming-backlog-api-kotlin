@@ -6,6 +6,7 @@ import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
+import java.time.LocalDate
 import java.util.*
 
 @Document("gameInstances")
@@ -33,5 +34,6 @@ data class GameInstance(
   var yearPlayed: Int? = null,
   var yearReceived: Int? = null,
   var notes: String? = null,
-  var platformsOwnedOn: List<String>? = null
+  var platformsOwnedOn: List<String>? = null,
+  var dateAdded: LocalDate? = null
   )

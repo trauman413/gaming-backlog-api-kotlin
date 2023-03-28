@@ -20,6 +20,7 @@ class GameController(
 
   /**
    * Returns all the existing games
+   * // TODO: temporary testing, will remove this in long term
    */
   @GetMapping("/")
   fun getGames(): ResponseEntity<List<Game>> {

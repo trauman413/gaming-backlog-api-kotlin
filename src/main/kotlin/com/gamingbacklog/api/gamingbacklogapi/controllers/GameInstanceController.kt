@@ -44,6 +44,10 @@ class GameInstanceController(
     @RequestBody gameRequest: GameInstanceRequest
   ): ResponseEntity<GameInstance> {
     val game = gameInstanceService.create(gameRequest)
+    // TODO: Support different responsss in GB-55
+    if (game == null) {
+      ResponseEntity<GameInstance>(null, HttpStatus.NOT_FOUND)
+    }
     return ResponseEntity<GameInstance>(game, HttpStatus.CREATED)
   }
 
@@ -52,7 +56,7 @@ class GameInstanceController(
    * @param id  A given game ID
    * @param gameRequest   The request with fields to be updated
    */
-  @PutMapping("/{id}")
+  @PatchMapping("/{id}")
   fun updateGameInstance(
     @PathVariable("id") id: String,
     @RequestBody gameRequest: GameInstanceRequest
