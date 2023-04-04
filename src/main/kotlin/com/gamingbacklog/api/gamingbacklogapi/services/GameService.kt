@@ -1,39 +1,45 @@
 package com.gamingbacklog.api.gamingbacklogapi.services
 
+import com.gamingbacklog.api.gamingbacklogapi.clients.IGDBClient
 import com.gamingbacklog.api.gamingbacklogapi.models.Game
+import com.gamingbacklog.api.gamingbacklogapi.models.igdb.*
 import com.gamingbacklog.api.gamingbacklogapi.repositories.GameRepository
 import com.gamingbacklog.api.gamingbacklogapi.requests.GameRequest
 import com.gamingbacklog.api.gamingbacklogapi.requests.Request
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
+import kotlin.collections.ArrayList
 
 @Service
 class GameService(
-  private val gameRepository: GameRepository
+  private val gameRepository: GameRepository,
+  private val igdbClient: IGDBClient
+
 ) : IService<Game> {
   override fun getAll(): List<Game> {
     return gameRepository.findAll()
   }
 
-  override fun getSingle(id: String): Game {
+  override fun getSingle(id: String): Game? {
     return gameRepository.findOneById(ObjectId(id))
   }
 
-  override fun create(request: Request): Game {
+  fun getByIGDBId(igdbId: String): Game? {
+    return gameRepository.findByigdbId(igdbId)
+  }
+
+  override fun create(request: Request): Game? {
     val gameRequest = request as GameRequest
-    val platform: String = if (gameRequest.platform == null) "" else gameRequest.platform!!
-    val genre: String = if (gameRequest.genre == null) "" else gameRequest.genre!!
-    val universe: String = if (gameRequest.universe == null) "" else gameRequest.universe!!
-    val company: String = if (gameRequest.company == null) "" else gameRequest.company!!
-    val game = Game(
-      name = gameRequest.name,
-      platform = platform,
-      genre = genre,
-      universe = universe,
-      company = company
-    )
-    gameRepository.save(game)
-    return game
+    val igdbId = gameRequest.igdbID
+    return try {
+      val igdbGame = igdbClient.gamesRequest(igdbClient.authenticate().access_token, igdbId)
+      val game = igdbGameToGame(igdbGame[0])
+      gameRepository.save(game)
+      game
+    } catch (ex: Exception) {
+      println("Exception when calling IGDB ${ex.localizedMessage}")
+      null
+    }
   }
 
   override fun delete(id: String) {
@@ -42,5 +48,58 @@ class GameService(
 
   override fun update(model: Game) {
     gameRepository.save(model)
+  }
+
+  fun igdbGameToGame(igdbGame: IGDBGame): Game {
+    return Game(
+      name = igdbGame.name,
+      platforms = extractFieldInfo(igdbGame.platforms),
+      genres = extractFieldInfo(igdbGame.genres),
+      companies = extractCompanyFieldInfo(igdbGame.involved_companies),
+      universes = extractFieldInfo(igdbGame.franchises),
+      images = extractArtworkFieldInfo(igdbGame.artworks),
+      releaseDate = extractReleaseDateFieldInfo(igdbGame.release_dates),
+      igdbId = igdbGame.id.toString()
+    )
+  }
+
+  fun extractFieldInfo(igdbProperties: List<FieldInfo>?): List<String> {
+    val fields = ArrayList<String>()
+    if (igdbProperties != null) {
+      for (field in igdbProperties) {
+        fields.add(field.name)
+      }
+    }
+    return fields
+  }
+
+  fun extractCompanyFieldInfo(companies: List<CompanyFieldInfo>?): List<String> {
+    val fields = ArrayList<String>()
+    if (companies != null) {
+      for (companyInfo in companies) {
+        fields.add(companyInfo.company.name);
+      }
+    }
+    return fields
+  }
+
+  fun extractArtworkFieldInfo(artworks: List<ArtworkInfo>?): List<String> {
+    val fields = ArrayList<String>()
+    if (artworks != null) {
+      for (artwork in artworks) {
+        fields.add(artwork.url);
+      }
+    }
+    return fields
+  }
+
+  fun extractReleaseDateFieldInfo(releaseDates: List<ReleaseDate>?): List<String> {
+    val fields = ArrayList<String>()
+    if (releaseDates != null) {
+      for (releaseDate in releaseDates) {
+        fields.add(releaseDate.human);
+      }
+    }
+    return fields
   }
 }

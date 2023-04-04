@@ -45,7 +45,8 @@ class IGDBClient(private val externalAPIClient: ExternalAPIClient) {
     accessToken: String,
     gameID: String
   ): Array<IGDBGame> {
-    val body = "fields name, platforms.name, genres.name, release_dates.human, summary, franchises.name, involved_companies.company.name, artworks.url; where id =$gameID;"
+    val body =
+      "fields name, platforms.name, genres.name, release_dates.human, summary, franchises.name, involved_companies.company.name, artworks.url; where id =$gameID;"
     val headers = HashMap<String, String>()
     headers["Client-ID"] = clientId
     headers["Authorization"] = "Bearer $accessToken"
@@ -53,9 +54,11 @@ class IGDBClient(private val externalAPIClient: ExternalAPIClient) {
     return if (response.statusCode() == 200 && response.body() != "[]") {
       Gson().fromJson(response.body(), Array<IGDBGame>::class.java)
     } else {
-      println("Status Code: ${if (response.statusCode() == 200) 404 else response.statusCode() }, " +
-        "Error: ${if (response.body() == "[]") "Not found" else response.body()}")
-      val blank = IGDBGame(0, emptyArray(), emptyArray(), emptyArray(), emptyArray(), "", emptyArray(), emptyArray(), "")
+      println(
+        "Status Code: ${if (response.statusCode() == 200) 404 else response.statusCode()}, " +
+          "Error: ${if (response.body() == "[]") "Not found" else response.body()}"
+      )
+      val blank = IGDBGame(0, emptyList(), emptyList(), emptyList(), emptyList(), "", emptyList(), emptyList(), "")
       arrayOf(blank)
     }
   }

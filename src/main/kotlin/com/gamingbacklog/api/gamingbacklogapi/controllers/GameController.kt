@@ -20,7 +20,7 @@ class GameController(
 
   /**
    * Returns all the existing games
-   * TODO: this will not be present in long-term
+   * // TODO: temporary testing, will remove this in long term
    */
   @GetMapping("/")
   fun getGames(): ResponseEntity<List<Game>> {
@@ -32,7 +32,6 @@ class GameController(
    * Returns a single game based on an id
    * @param id  A given game ID
    *
-   * @TODO this will likely not be present in long-term
    */
   @GetMapping("/{id}")
   fun getSingleGame(
@@ -40,20 +39,6 @@ class GameController(
   ): ResponseEntity<Game> {
     val game = gameService.getSingle(id)
     return ResponseEntity.ok(game)
-  }
-
-  /**
-   * Creates a new game
-   * @param gameRequest The game to be created
-   *
-   * TODO: this will be adopted to be gameInstance
-   */
-  @PostMapping("/")
-  fun createGame(
-    @RequestBody gameRequest: GameRequest
-  ): ResponseEntity<Game> {
-    val game = gameService.create(gameRequest)
-    return ResponseEntity<Game>(game, HttpStatus.CREATED)
   }
 
   @GetMapping("/authenticate")
