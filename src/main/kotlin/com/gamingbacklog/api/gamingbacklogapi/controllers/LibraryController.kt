@@ -1,6 +1,6 @@
 package com.gamingbacklog.api.gamingbacklogapi.controllers
 
-import com.gamingbacklog.api.gamingbacklogapi.models.Game
+import com.gamingbacklog.api.gamingbacklogapi.models.GameInstance
 import com.gamingbacklog.api.gamingbacklogapi.models.Library
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.LibraryRequest
 import com.gamingbacklog.api.gamingbacklogapi.models.responses.GameResponse
@@ -70,10 +70,10 @@ class LibraryController(private val libraryService: LibraryService) {
   fun getGameFromLibrary(
     @PathVariable("id") libraryId: String,
     @PathVariable("gameId") gameId: String
-  ): ResponseEntity<Game> {
+  ): ResponseEntity<GameInstance> {
     val game = libraryService.getGameFromLibrary(libraryId, gameId)
-      ?: return ResponseEntity<Game>( null, HttpStatus.NOT_FOUND)
-    return ResponseEntity<Game>(game, HttpStatus.OK)
+      ?: return ResponseEntity<GameInstance>( null, HttpStatus.NOT_FOUND)
+    return ResponseEntity<GameInstance>(game, HttpStatus.OK)
   }
 
   @DeleteMapping("/{id}")

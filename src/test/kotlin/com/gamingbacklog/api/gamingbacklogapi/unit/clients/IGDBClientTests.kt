@@ -22,7 +22,7 @@ import org.mockito.kotlin.eq
 @Import(IGDBClient::class)
 @TestPropertySource(properties = ["CLIENT_ID=test_id", "CLIENT_SECRET=test_secret"])
 class IGDBClientTests {
-  var externalAPIClient: ExternalAPIClient = mock(ExternalAPIClient::class.java)
+  final var externalAPIClient: ExternalAPIClient = mock(ExternalAPIClient::class.java)
   var igdbClient: IGDBClient = IGDBClient(externalAPIClient)
 
   @Nested
@@ -90,7 +90,7 @@ class IGDBClientTests {
         400
       )
       )
-      val result = igdbClient.gamesRequest("test_secret", "000")
+      val result = igdbClient.gamesRequest("test_secret", "0")
       Assertions.assertEquals(result[0].name, "")
       Assertions.assertEquals(result[0].summary, "")
     }
@@ -103,7 +103,7 @@ class IGDBClientTests {
         404
       )
       )
-      val result = igdbClient.gamesRequest("test_secret", "1i93837189")
+      val result = igdbClient.gamesRequest("test_secret", "193837189")
       Assertions.assertEquals(result[0].name, "")
       Assertions.assertEquals(result[0].summary, "")
     }
