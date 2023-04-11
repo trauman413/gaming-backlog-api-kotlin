@@ -1,12 +1,12 @@
 package com.gamingbacklog.api.gamingbacklogapi.services
 
-import com.gamingbacklog.api.gamingbacklogapi.models.Game
 import com.gamingbacklog.api.gamingbacklogapi.models.GameInstance
 import com.gamingbacklog.api.gamingbacklogapi.models.Library
-import com.gamingbacklog.api.gamingbacklogapi.repositories.GameRepository
 import com.gamingbacklog.api.gamingbacklogapi.repositories.LibraryRepository
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.LibraryRequest
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.Request
+import com.gamingbacklog.api.gamingbacklogapi.models.responses.GameResponse
+import com.gamingbacklog.api.gamingbacklogapi.models.responses.LibraryResponse
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import java.util.ArrayList
@@ -60,6 +60,16 @@ class LibraryService (
         return null
       }
     return gameInstanceService.getSingle(gameId)
+  }
+
+  fun convertLibraryToResponse(library: Library): LibraryResponse {
+    if (library.games.size > 0) {
+      val games: List<GameInstance> = library.games.map { gameId -> getGameFromLibrary(library.id, gameId)!! }
+      val gameResponses = games.map { game -> GameResponse(game.id, game.name) }
+      return LibraryResponse(id = library.id, name = library.name, games = gameResponses)
+    } else {
+      return LibraryResponse(id = library.id, name = library.name, games = emptyList());
+    }
   }
 
 }

@@ -30,7 +30,7 @@ class GameService(
 
   override fun create(request: Request): Game? {
     val gameRequest = request as GameRequest
-    val igdbId = gameRequest.igdbID
+    val igdbId = gameRequest.igdbId
     return try {
       val igdbGame = igdbClient.gamesRequest(igdbClient.authenticate().access_token, igdbId)
       val game = igdbGameToGame(igdbGame[0])

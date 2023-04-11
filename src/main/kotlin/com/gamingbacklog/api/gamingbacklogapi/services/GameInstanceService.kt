@@ -1,16 +1,13 @@
 package com.gamingbacklog.api.gamingbacklogapi.services
 
-import com.gamingbacklog.api.gamingbacklogapi.clients.IGDBClient
 import com.gamingbacklog.api.gamingbacklogapi.models.GameInstance
+import com.gamingbacklog.api.gamingbacklogapi.models.requests.GameRequest
+import com.gamingbacklog.api.gamingbacklogapi.models.requests.Request
 import com.gamingbacklog.api.gamingbacklogapi.repositories.GameInstanceRepository
-import com.gamingbacklog.api.gamingbacklogapi.repositories.GameRepository
 import com.gamingbacklog.api.gamingbacklogapi.requests.GameInstanceRequest
-import com.gamingbacklog.api.gamingbacklogapi.requests.GameRequest
-import com.gamingbacklog.api.gamingbacklogapi.requests.Request
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import java.time.LocalDate
-import java.util.*
 
 @Service
 class GameInstanceService(
