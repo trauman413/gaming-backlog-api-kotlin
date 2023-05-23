@@ -35,7 +35,8 @@ class GameInstanceService(
         universes = game.universes,
         companies = game.companies,
         releaseDate = game.releaseDate,
-        images = game.images
+        images = game.images,
+        summary = game.summary
       )
       gameInstanceRepository.save(gameInstance)
       return gameInstance
@@ -53,7 +54,8 @@ class GameInstanceService(
       universes = game.universes,
       companies = game.companies,
       releaseDate = game.releaseDate,
-      images = game.images
+      images = game.images,
+      summary = game.summary
     )
     gameInstanceRepository.save(gameInstance)
     return gameInstance

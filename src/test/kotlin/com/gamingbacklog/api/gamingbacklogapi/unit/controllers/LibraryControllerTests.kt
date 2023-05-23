@@ -165,7 +165,7 @@ class LibraryControllerTests {
       library.games.add("gameId1")
       val game = GameInstance("gameId1", "19", "Fire Emblem: Engage",
         arrayListOf("Nintendo Switch"), arrayListOf("RPG"), arrayListOf("Fire Emblem"), arrayListOf("Nintendo", "Intelligent Systems"),
-        arrayListOf("January 20 2023"), arrayListOf(""))
+        arrayListOf("January 20 2023"), arrayListOf(""), "Shine on, Emblem of Beginnings!")
       given(libraryService.getGameFromLibrary(any(), any())).willReturn(game)
       endpoint += "$id1/games/${"gameId1"}"
       requestBuilder.runGetRequest(endpoint)

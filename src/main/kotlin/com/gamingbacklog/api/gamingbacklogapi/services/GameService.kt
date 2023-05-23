@@ -59,6 +59,7 @@ class GameService(
       universes = extractFieldInfo(igdbGame.franchises),
       images = extractArtworkFieldInfo(igdbGame.artworks),
       releaseDate = extractReleaseDateFieldInfo(igdbGame.release_dates),
+      summary = igdbGame.summary,
       igdbId = igdbGame.id.toString()
     )
   }

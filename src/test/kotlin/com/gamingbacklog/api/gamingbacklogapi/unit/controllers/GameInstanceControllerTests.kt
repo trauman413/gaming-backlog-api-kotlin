@@ -57,9 +57,9 @@ class GameInstanceControllerTests {
     @Test
     fun shouldSuccessfullyGetAllGameInstances() {
       val game1 = GameInstance("id1", "igdb1", "Persona 5 Royal",
-        arrayListOf("PS4"), arrayListOf("RPG"), arrayListOf("Persona"), arrayListOf("Atlus"), arrayListOf("2020"), arrayListOf(""))
+        arrayListOf("PS4"), arrayListOf("RPG"), arrayListOf("Persona"), arrayListOf("Atlus"), arrayListOf("2020"), arrayListOf(""), "Steal their heart!")
       val game2 = GameInstance("id2", "igdb2", "Persona 4 Golden",
-        arrayListOf("PSVita"), arrayListOf("RPG"), arrayListOf("Persona"), arrayListOf("Atlus"), arrayListOf("2012"), arrayListOf(""))
+        arrayListOf("PSVita"), arrayListOf("RPG"), arrayListOf("Persona"), arrayListOf("Atlus"), arrayListOf("2012"), arrayListOf(""), "Everyday is great at your Junes!")
       val games = ArrayList<GameInstance>()
       games.add(game1)
       games.add(game2)
@@ -72,6 +72,7 @@ class GameInstanceControllerTests {
         .andExpect(jsonPath("$[0].universes[0]", equalTo("Persona")))
         .andExpect(jsonPath("$[0].companies[0]", equalTo("Atlus")))
         .andExpect(jsonPath("$[0].releaseDate[0]", equalTo("2020")))
+        .andExpect(jsonPath("$[0].summary", equalTo(game1.summary)))
         .andExpect(jsonPath("$[0].id", equalTo("id1")))
         .andExpect(jsonPath("$[1].name", equalTo("Persona 4 Golden")))
         .andExpect(jsonPath("$[1].platforms[0]", equalTo("PSVita")))
@@ -79,6 +80,7 @@ class GameInstanceControllerTests {
         .andExpect(jsonPath("$[1].universes[0]", equalTo("Persona")))
         .andExpect(jsonPath("$[1].companies[0]", equalTo("Atlus")))
         .andExpect(jsonPath("$[1].releaseDate[0]", equalTo("2012")))
+        .andExpect(jsonPath("$[1].summary", equalTo(game2.summary)))
         .andExpect(jsonPath("$[1].id", equalTo("id2")))
     }
   }
@@ -91,7 +93,7 @@ class GameInstanceControllerTests {
     fun shouldSuccessfullyReturnGame() {
       val game = GameInstance(id1, "igdb1", "Live a Live",
         arrayListOf("Nintendo Switch"), arrayListOf("RPG"), arrayListOf("Live a Live"), arrayListOf("Square Enix"),
-        arrayListOf("2022"), arrayListOf("url"))
+        arrayListOf("2022"), arrayListOf("url"), "so many stories")
       given(gameInstanceService.getSingle(any())).willReturn(game)
       endpoint += "$id1/"
       requestBuilder.runGetRequest(endpoint)
@@ -104,6 +106,7 @@ class GameInstanceControllerTests {
         .andExpect(jsonPath("$.companies[0]", equalTo("Square Enix")))
         .andExpect(jsonPath("$.releaseDate[0]", equalTo("2022")))
         .andExpect(jsonPath("$.images[0]", equalTo("url")))
+        .andExpect(jsonPath("$.summary", equalTo("so many stories")))
         .andExpect(jsonPath("$.id", equalTo(id1)))
     }
 
@@ -125,7 +128,7 @@ class GameInstanceControllerTests {
       val newGame = GameInstance(id1, "igdb1", "Celeste",
         arrayListOf("Nintendo Switch", "PC", "PS4", "Xbox One"),
         arrayListOf("Platformer"), arrayListOf("Celeste"), arrayListOf("Extremely OK Games"),
-        arrayListOf("2018"), arrayListOf("so mountain"))
+        arrayListOf("2018"), arrayListOf("so mountain"), "Climb up the mountain in this hard platformer")
       given(gameInstanceService.create(any())).willReturn(newGame)
       val gameInstanceRequest = GameInstanceRequest("igdb1",
         null, null, null, null, null, null, null)
@@ -143,6 +146,7 @@ class GameInstanceControllerTests {
         .andExpect(jsonPath("$.companies[0]", equalTo(newGame.companies[0])))
         .andExpect(jsonPath("$.releaseDate[0]", equalTo(newGame.releaseDate[0])))
         .andExpect(jsonPath("$.images[0]", equalTo(newGame.images[0])))
+        .andExpect(jsonPath("$.summary", equalTo(newGame.summary)))
     }
   }
 
@@ -173,7 +177,7 @@ class GameInstanceControllerTests {
       val game = GameInstance(id1, "igdb1", "Trails in the Sky",
         arrayListOf("PC", "PSP"),
         arrayListOf("RPG"), arrayListOf("Trails", "Legend of Heroes"), arrayListOf("Falcom"),
-        arrayListOf("2004"), arrayListOf("sky"))
+        arrayListOf("2004"), arrayListOf("sky"), "wholesome")
       given(gameInstanceService.updateWithCustomFields(any(), any())).will {
         setValues(gameInstanceRequest, game)
       }
@@ -204,7 +208,7 @@ class GameInstanceControllerTests {
       val game = GameInstance(id1, "igdb1", "Final Fantasy X",
         arrayListOf("a lot"),
         arrayListOf("RPG"), arrayListOf("Final Fantasy"), arrayListOf("Square Enix"),
-        arrayListOf("2001"), arrayListOf("zanarkand"))
+        arrayListOf("2001"), arrayListOf("zanarkand"), "this game will make you cry")
 
       given(gameInstanceService.updateWithCustomFields(any(), any())).will {
         setValues(gameInstanceRequest, game)
@@ -232,7 +236,7 @@ class GameInstanceControllerTests {
       val newGame = GameInstance(id1, "igdb1", "Paper Mario: The Thousand Year Door",
         arrayListOf("GameCube"),
         arrayListOf("RPG"), arrayListOf("Paper Mario"), arrayListOf("Nintendo", "Intelligent Systems"),
-        arrayListOf("2004"), arrayListOf("url"))
+        arrayListOf("2004"), arrayListOf("url"), "Fun turn-based fun")
       val games = ArrayList<GameInstance>()
       games.add(newGame)
       BDDMockito.given(gameInstanceService.delete(any())).will {

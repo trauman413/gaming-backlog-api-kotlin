@@ -23,5 +23,6 @@ data class Game(
   val companies: List<String>,
   val releaseDate: List<String>,
   val images: List<String>,
+  val summary: String
 
   )

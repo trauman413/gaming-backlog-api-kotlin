@@ -31,9 +31,9 @@ class GameInstanceServiceTests {
   inner class Create {
     // id exists in game repo --> create from there, no igdb
     private val foundGame = Game("id", "301", "Pokemon Emerald", arrayListOf("GBA"), arrayListOf("RPG"),
-       arrayListOf("Pokemon"), arrayListOf("Game Freak"), arrayListOf("2004"), arrayListOf("url"))
+       arrayListOf("Pokemon"), arrayListOf("Game Freak"), arrayListOf("2004"), arrayListOf("url"), "7/10 too much water")
     private val foundGameInstance = GameInstance("id", "301", "Pokemon Emerald", arrayListOf("GBA"), arrayListOf("RPG"),
-      arrayListOf("Pokemon"), arrayListOf("Game Freak"), arrayListOf("2004"), arrayListOf("url"))
+      arrayListOf("Pokemon"), arrayListOf("Game Freak"), arrayListOf("2004"), arrayListOf("url"), "7/10 too much water")
 
     private val request = GameInstanceRequest("301", null, null,
       null, null, null, null, null)
@@ -50,6 +50,7 @@ class GameInstanceServiceTests {
       Assertions.assertEquals(foundGame.companies, result?.companies)
       Assertions.assertEquals(foundGame.releaseDate, result?.releaseDate)
       Assertions.assertEquals(foundGame.images, result?.images)
+      Assertions.assertEquals(foundGame.summary, result?.summary)
     }
     // id does not exist --> call igdb, create
     @Test
@@ -89,7 +90,7 @@ class GameInstanceServiceTests {
         "id", "igdb1", "Mass Effect 2",
         arrayListOf("a lot"),
         arrayListOf("RPG"), arrayListOf("Mass Effect"), arrayListOf("BioWare"),
-        arrayListOf("2007"), arrayListOf("normandy")
+        arrayListOf("2007"), arrayListOf("normandy"), "Create a space crew and stop the Reapers!"
       )
       given(gameInstanceRepository.findOneById(any())).willReturn(game)
       gameInstanceService.updateWithCustomFields("dd7f03b962f1f3416d08ee0f", gameInstanceRequest)
@@ -117,7 +118,7 @@ class GameInstanceServiceTests {
     val game = GameInstance("id", "igdb1", "Kingdom Hearts",
       arrayListOf("a lot"),
       arrayListOf("RPG"), arrayListOf("Kingdom Hearts"), arrayListOf("Square Enix"),
-      arrayListOf("2002"), arrayListOf("heart in the light or something"))
+      arrayListOf("2002"), arrayListOf("heart in the light or something"), "Disney meets FF but mostly disney")
     given(gameInstanceRepository.findOneById(any())).willReturn(game)
     gameInstanceService.updateWithCustomFields("dd7f03b962f1f3416d08ee0f", gameInstanceRequest)
     Assertions.assertEquals(game.rating, gameInstanceRequest.rating)
