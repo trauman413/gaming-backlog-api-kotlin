@@ -6,5 +6,8 @@ import org.springframework.data.mongodb.repository.MongoRepository
 
 interface GameInstanceRepository: MongoRepository<GameInstance, String> {
   fun findOneById(id: ObjectId): GameInstance?
+
+  fun findByName(name: String): GameInstance?
+
   override fun deleteAll()
 }

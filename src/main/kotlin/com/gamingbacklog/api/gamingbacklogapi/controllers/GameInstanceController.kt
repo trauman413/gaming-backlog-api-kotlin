@@ -1,6 +1,5 @@
 package com.gamingbacklog.api.gamingbacklogapi.controllers
 
-import com.gamingbacklog.api.gamingbacklogapi.clients.IGDBClient
 import com.gamingbacklog.api.gamingbacklogapi.models.GameInstance
 import com.gamingbacklog.api.gamingbacklogapi.requests.GameInstanceRequest
 import com.gamingbacklog.api.gamingbacklogapi.services.GameInstanceService

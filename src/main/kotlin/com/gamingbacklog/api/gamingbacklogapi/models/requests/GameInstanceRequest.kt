@@ -1,6 +1,6 @@
 package com.gamingbacklog.api.gamingbacklogapi.requests
 
-import java.util.*
+import com.gamingbacklog.api.gamingbacklogapi.models.requests.Request
 
 class GameInstanceRequest(
   var igdbId: String?,
