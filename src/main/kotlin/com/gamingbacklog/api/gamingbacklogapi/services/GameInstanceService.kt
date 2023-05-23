@@ -22,6 +22,10 @@ class GameInstanceService(
     return gameInstanceRepository.findOneById(ObjectId(id))
   }
 
+  override fun getSingleByName(name: String): GameInstance? {
+    return gameInstanceRepository.findByName(name)
+  }
+
   override fun create(request: Request): GameInstance? {
     val gameInstanceRequest = request as GameInstanceRequest
     val igdbId = gameInstanceRequest.igdbId!! // TODO: GB-55 error handling

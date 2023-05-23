@@ -24,6 +24,11 @@ class GameService(
     return gameRepository.findOneById(ObjectId(id))
   }
 
+  override fun getSingleByName(name: String): Game? {
+    return gameRepository.findByName(name)
+
+  }
+
   fun getByIGDBId(igdbId: String): Game? {
     return gameRepository.findByigdbId(igdbId)
   }

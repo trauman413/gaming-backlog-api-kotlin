@@ -15,6 +15,7 @@ import java.util.ArrayList
 @Service
 class LibraryService (
   private val libraryRepository: LibraryRepository,
+  private val gameService: GameService,
   private val gameInstanceService: GameInstanceService
 ) : IService<Library> {
 
@@ -24,6 +25,11 @@ class LibraryService (
 
   override fun getSingle(id: String): Library? {
     return libraryRepository.findOneById(ObjectId(id))
+  }
+
+  override fun getSingleByName(name: String): Library? {
+    return libraryRepository.findByName(name)
+
   }
 
   override fun create(request: Request): Library {
@@ -59,7 +65,8 @@ class LibraryService (
     if (library != null && !library.games.contains(gameId)) {
         return null
       }
-    return gameInstanceService.getSingle(gameId)
+    val game = gameService.getSingle(gameId)
+    return gameInstanceService.getSingleByName(game!!.name)
   }
 
   fun convertLibraryToResponse(library: Library): LibraryResponse {
