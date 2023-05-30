@@ -37,6 +37,16 @@ class LibraryController(private val libraryService: LibraryService) {
     return ResponseEntity.ok(library)
   }
 
+  @CrossOrigin(origins = ["http://localhost:3000", "http://localhost:3000/libraries"])
+  @GetMapping("/{id}/withGames")
+  fun getSingleLibraryWithGames(
+    @PathVariable("id") id: String
+  ): ResponseEntity<LibraryResponse> {
+    val library = libraryService.getSingle(id) ?: return ResponseEntity<LibraryResponse>( null, HttpStatus.NOT_FOUND)
+    val libraryResponse = libraryService.convertLibraryToResponse(library)
+    return ResponseEntity.ok(libraryResponse)
+  }
+
   @PostMapping("/")
   fun createLibrary(
     @RequestBody libraryRequest: LibraryRequest
