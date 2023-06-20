@@ -4,8 +4,8 @@ import com.gamingbacklog.api.gamingbacklogapi.clients.IGDBClient
 import com.gamingbacklog.api.gamingbacklogapi.models.Game
 import com.gamingbacklog.api.gamingbacklogapi.models.igdb.*
 import com.gamingbacklog.api.gamingbacklogapi.repositories.GameRepository
-import com.gamingbacklog.api.gamingbacklogapi.requests.GameRequest
-import com.gamingbacklog.api.gamingbacklogapi.requests.Request
+import com.gamingbacklog.api.gamingbacklogapi.models.requests.GameRequest
+import com.gamingbacklog.api.gamingbacklogapi.models.requests.Request
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import kotlin.collections.ArrayList
@@ -24,13 +24,18 @@ class GameService(
     return gameRepository.findOneById(ObjectId(id))
   }
 
+  override fun getSingleByName(name: String): Game? {
+    return gameRepository.findByName(name)
+
+  }
+
   fun getByIGDBId(igdbId: String): Game? {
     return gameRepository.findByigdbId(igdbId)
   }
 
   override fun create(request: Request): Game? {
     val gameRequest = request as GameRequest
-    val igdbId = gameRequest.igdbID
+    val igdbId = gameRequest.igdbId
     return try {
       val igdbGame = igdbClient.gamesRequest(igdbClient.authenticate().access_token, igdbId)
       val game = igdbGameToGame(igdbGame[0])
@@ -59,6 +64,7 @@ class GameService(
       universes = extractFieldInfo(igdbGame.franchises),
       images = extractArtworkFieldInfo(igdbGame.artworks),
       releaseDate = extractReleaseDateFieldInfo(igdbGame.release_dates),
+      summary = igdbGame.summary,
       igdbId = igdbGame.id.toString()
     )
   }

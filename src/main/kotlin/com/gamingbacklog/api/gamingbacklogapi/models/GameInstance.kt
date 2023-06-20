@@ -26,6 +26,7 @@ data class GameInstance(
   val companies: List<String>,
   val releaseDate: List<String>,
   val images: List<String>,
+  val summary: String,
 
   // user-custom data
   var rating: Int? = null,
