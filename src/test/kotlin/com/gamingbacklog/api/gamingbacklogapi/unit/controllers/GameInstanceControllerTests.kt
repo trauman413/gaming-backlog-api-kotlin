@@ -2,14 +2,11 @@ package com.gamingbacklog.api.gamingbacklogapi.unit.controllers
 
 import com.gamingbacklog.api.gamingbacklogapi.controllers.GameInstanceController
 import com.gamingbacklog.api.gamingbacklogapi.models.GameInstance
-import com.gamingbacklog.api.gamingbacklogapi.models.Library
 import com.gamingbacklog.api.gamingbacklogapi.requests.GameInstanceRequest
-import com.gamingbacklog.api.gamingbacklogapi.requests.LibraryRequest
 import com.gamingbacklog.api.gamingbacklogapi.services.GameInstanceService
 import com.google.gson.Gson
 import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.CoreMatchers.equalToObject
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach

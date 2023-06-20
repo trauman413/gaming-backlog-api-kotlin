@@ -1,7 +1,6 @@
 package com.gamingbacklog.api.gamingbacklogapi.unit.controllers
 
 import com.gamingbacklog.api.gamingbacklogapi.controllers.LibraryController
-import com.gamingbacklog.api.gamingbacklogapi.models.Game
 import com.gamingbacklog.api.gamingbacklogapi.models.GameInstance
 import com.gamingbacklog.api.gamingbacklogapi.models.Library
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.LibraryRequest
@@ -52,7 +51,7 @@ class LibraryControllerTests {
       libraries.add(library1)
       libraries.add(library2)
       given(libraryService.getAll()).willReturn(libraries)
-      requestBuilder.runGetRequest(endpoint+"all/")
+      requestBuilder.runGetRequest(endpoint)
         .andExpect(status().isOk)
         .andExpect(jsonPath("$[0].name", equalTo("Backlog")))
         .andExpect(jsonPath("$[0].games", equalToObject(ArrayList<String>())))
@@ -196,6 +195,4 @@ class LibraryControllerTests {
   fun requestToString(request: LibraryRequest): String {
     return Gson().toJson(request)
   }
-
-
 }
