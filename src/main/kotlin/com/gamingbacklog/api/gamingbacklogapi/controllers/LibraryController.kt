@@ -47,6 +47,7 @@ class LibraryController(private val libraryService: LibraryService) {
     return ResponseEntity.ok(libraryResponse)
   }
 
+  @CrossOrigin(origins = ["http://localhost:3000", "http://localhost:3000/libraries"])
   @PostMapping("/")
   fun createLibrary(
     @RequestBody libraryRequest: LibraryRequest
