@@ -13,6 +13,8 @@ import java.util.*
 @RestController
 @RequestMapping("/libraries")
 class LibraryController(private val libraryService: LibraryService) {
+
+  @CrossOrigin(origins = ["http://localhost:3000"])
   @GetMapping("/")
   fun getAllLibraries(): ResponseEntity<List<Library>> {
     val libraries = libraryService.getAll()
@@ -56,6 +58,7 @@ class LibraryController(private val libraryService: LibraryService) {
     return ResponseEntity<Library>(library, HttpStatus.CREATED)
   }
 
+  @CrossOrigin(origins = ["http://localhost:3000", "http://localhost:3000/libraries"])
   @PutMapping("/{libraryId}/addToLibrary")
   fun addToLibrary(
     @PathVariable("libraryId") libraryId: String,
@@ -74,6 +77,15 @@ class LibraryController(private val libraryService: LibraryService) {
     val game = libraryService.getGameFromLibrary(libraryId, gameId)
       ?: return ResponseEntity<GameInstance>( null, HttpStatus.NOT_FOUND)
     return ResponseEntity<GameInstance>(game, HttpStatus.OK)
+  }
+
+  @DeleteMapping("/{id}/games/{gameId}")
+  fun deleteGameFromLibrary(
+    @PathVariable("id") libraryId: String,
+    @PathVariable("gameId") gameId: String
+  ): ResponseEntity<String> {
+    libraryService.deleteGameFromLibrary(libraryId, gameId)
+    return ResponseEntity.ok("Successfully deleted game $gameId from library $libraryId")
   }
 
   @DeleteMapping("/{id}")

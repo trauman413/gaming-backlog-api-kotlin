@@ -192,6 +192,22 @@ class LibraryControllerTests {
     }
   }
 
+  @Nested
+  @DisplayName("Tests for deleteGameFromLibrary")
+  inner class DeleteGameFromLibraryTests {
+    @Test
+    fun shouldSuccessfullyDeleteGameFromLibrary() {
+      val library = Library("library-id1", "Backlog", arrayListOf("id1", "id2", "id3"))
+      given(libraryService.deleteGameFromLibrary("library-id1", "id1")).will {
+        library.games.remove("id1")
+      }
+      endpoint += "library-id1/games/id1"
+      requestBuilder.runDeleteRequest(endpoint)
+        .andExpect(status().isOk)
+        .andExpect(content().string(containsString("Successfully deleted game id1 from library library-id")))
+    }
+  }
+
   fun requestToString(request: LibraryRequest): String {
     return Gson().toJson(request)
   }

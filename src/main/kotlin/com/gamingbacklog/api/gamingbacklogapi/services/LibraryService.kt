@@ -59,6 +59,14 @@ class LibraryService (
     }
   }
 
+  fun deleteGameFromLibrary(libraryId: String, gameId: String) {
+    val library = getSingle(libraryId)
+    if (library != null) {
+      library.games.remove(gameId)
+      update(library)
+    }
+  }
+
   // TODO: error handling here
   fun getGameFromLibrary(libraryId: String, gameId: String): GameInstance? {
     val library = libraryRepository.findOneById(ObjectId(libraryId))
@@ -66,7 +74,11 @@ class LibraryService (
         return null
       }
     val game = gameService.getSingle(gameId)
-    return gameInstanceService.getSingleByName(game!!.name)
+    if (game == null) {
+      val gameInstance = gameInstanceService.getSingle(gameId)
+      return gameInstance?.name?.let { gameInstanceService.getSingleByName(it) }
+    }
+    return gameInstanceService.getSingleByName(game.name)
   }
 
   fun convertLibraryToResponse(library: Library): LibraryResponse {
