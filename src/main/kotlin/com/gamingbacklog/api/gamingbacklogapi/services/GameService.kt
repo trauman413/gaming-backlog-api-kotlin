@@ -61,7 +61,7 @@ class GameService(
       platforms = extractFieldInfo(igdbGame.platforms),
       genres = extractFieldInfo(igdbGame.genres),
       companies = extractCompanyFieldInfo(igdbGame.involved_companies),
-      universes = extractFieldInfo(igdbGame.franchises),
+      universes = if (igdbGame.franchises.isNullOrEmpty()) null else extractFieldInfo(igdbGame.franchises),
       images = extractArtworkFieldInfo(igdbGame.artworks),
       releaseDate = extractReleaseDateFieldInfo(igdbGame.release_dates),
       summary = igdbGame.summary,

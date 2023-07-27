@@ -22,7 +22,7 @@ data class GameInstance(
   val name: String,
   val platforms: List<String>,
   val genres: List<String>,
-  val universes: List<String>,
+  val universes: List<String>?,
   val companies: List<String>,
   val releaseDate: List<String>,
   val images: List<String>,
