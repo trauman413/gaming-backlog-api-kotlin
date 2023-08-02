@@ -73,7 +73,7 @@ class IGDBClientTests {
       val result = igdbClient.gamesRequest("test_secret", "191")
       Assertions.assertEquals(result[0].id, 191411)
       Assertions.assertEquals(result[0].artworks[0].url, "//images.igdb.com/igdb/image/upload/t_thumb/ar1lkx.jpg")
-      Assertions.assertEquals(result[0].franchises[0].name, "Xenoblade")
+      Assertions.assertEquals(result[0].franchises?.get(0)?.name, "Xenoblade")
       Assertions.assertEquals(result[0].genres[0].name, "Role-playing (RPG)")
       Assertions.assertEquals(result[0].genres[1].name, "Adventure")
       Assertions.assertEquals(result[0].involved_companies[0].company.name, "Monolith Soft")
@@ -82,6 +82,27 @@ class IGDBClientTests {
       Assertions.assertEquals(result[0].release_dates[0].human, "Jul 29, 2022")
       Assertions.assertEquals(result[0].summary, "Eunie's the bussss")
     }
+
+    @Test
+    fun shouldSuccessfullyReturnGameWithEmptyFranchise() {
+      given(externalAPIClient.postExternalCall(any(), any(), any())).willReturn(
+        MockResponse(
+          ResponseConstants.mockIGDBGetGame200ResponseNoFranchise,
+          200
+        )
+      )
+      val result = igdbClient.gamesRequest("test_secret", "191")
+      Assertions.assertEquals(result[0].id, 191407)
+      Assertions.assertEquals(result[0].artworks[0].url, "//images.igdb.com/igdb/image/upload/t_thumb/ar1gck.jpg")
+      Assertions.assertNull(result[0].franchises)
+      Assertions.assertEquals(result[0].genres[0].name, "Role-playing (RPG)")
+      Assertions.assertEquals(result[0].genres[1].name, "Adventure")
+      Assertions.assertEquals(result[0].involved_companies[0].company.name, "Square Enix")
+      Assertions.assertEquals(result[0].name, "Live A Live")
+      Assertions.assertEquals(result[0].release_dates[0].human, "Jul 22, 2022")
+      Assertions.assertEquals(result[0].summary, "is it live or live")
+    }
+
     @Test
     fun shouldReturn400SyntaxError() {
       given(externalAPIClient.postExternalCall(any(), any(), any())).willReturn(
