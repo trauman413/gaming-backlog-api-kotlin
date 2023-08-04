@@ -122,10 +122,16 @@ class GameInstanceControllerTests {
   inner class CreateGameInstance {
     @Test
     fun shouldSuccessfullyCreateGame() {
-      val newGame = GameInstance(id1, "igdb1", "Celeste",
-        arrayListOf("Nintendo Switch", "PC", "PS4", "Xbox One"),
-        arrayListOf("Platformer"), arrayListOf("Celeste"), arrayListOf("Extremely OK Games"),
-        arrayListOf("2018"), arrayListOf("so mountain"), "Climb up the mountain in this hard platformer")
+      val newGame = GameInstance(
+        id = id1,
+        igdbId = "igdb1",
+        name = "Celeste",
+        platforms = arrayListOf("Nintendo Switch", "PC", "PS4", "Xbox One"),
+        genres = arrayListOf("Platformer"),
+        companies = arrayListOf("Extremely OK Games"),
+        releaseDate = arrayListOf("2018"),
+        images = arrayListOf("so mountain"),
+        summary = "Climb up the mountain in this hard platformer")
       given(gameInstanceService.create(any())).willReturn(newGame)
       val gameInstanceRequest = GameInstanceRequest("igdb1",
         null, null, null, null, null, null, null)
@@ -139,7 +145,7 @@ class GameInstanceControllerTests {
         .andExpect(jsonPath("$.platforms[2]", equalTo(newGame.platforms[2])))
         .andExpect(jsonPath("$.platforms[3]", equalTo(newGame.platforms[3])))
         .andExpect(jsonPath("$.genres[0]", equalTo(newGame.genres[0])))
-        .andExpect(jsonPath("$.universes[0]", equalTo(newGame.universes[0])))
+        .andExpect(jsonPath("$.universes", equalTo(null)))
         .andExpect(jsonPath("$.companies[0]", equalTo(newGame.companies[0])))
         .andExpect(jsonPath("$.releaseDate[0]", equalTo(newGame.releaseDate[0])))
         .andExpect(jsonPath("$.images[0]", equalTo(newGame.images[0])))
