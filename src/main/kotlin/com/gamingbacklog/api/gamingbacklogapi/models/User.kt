@@ -1,16 +1,14 @@
 package com.gamingbacklog.api.gamingbacklogapi.models
 
-import lombok.AllArgsConstructor
-import lombok.Data
-import lombok.NoArgsConstructor
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
-@Document("libraries")
-data class Library (
+@Document("users")
+data class User(
   @Id
   val id: String = ObjectId.get().toString(),
-  val name: String,
-  val games: ArrayList<String>
+  var username: String,
+  var password: String,
+  var email: String
 )
