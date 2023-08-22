@@ -5,7 +5,8 @@ import org.bson.types.ObjectId
 import org.springframework.data.mongodb.repository.MongoRepository
 
 interface LibraryRepository : MongoRepository<Library, String> {
-  fun findOneById(id: ObjectId): Library
+  fun findOneById(id: ObjectId): Library?
+  fun findByName(name: String): Library?
   override fun deleteAll()
 
 }

@@ -1,27 +1,35 @@
 package com.gamingbacklog.api.gamingbacklogapi.services
 
-import com.gamingbacklog.api.gamingbacklogapi.models.Game
+import com.gamingbacklog.api.gamingbacklogapi.models.GameInstance
 import com.gamingbacklog.api.gamingbacklogapi.models.Library
-import com.gamingbacklog.api.gamingbacklogapi.repositories.GameRepository
 import com.gamingbacklog.api.gamingbacklogapi.repositories.LibraryRepository
-import com.gamingbacklog.api.gamingbacklogapi.requests.LibraryRequest
-import com.gamingbacklog.api.gamingbacklogapi.requests.Request
+import com.gamingbacklog.api.gamingbacklogapi.models.requests.LibraryRequest
+import com.gamingbacklog.api.gamingbacklogapi.models.requests.Request
+import com.gamingbacklog.api.gamingbacklogapi.models.responses.GameResponse
+import com.gamingbacklog.api.gamingbacklogapi.models.responses.LibraryResponse
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import java.util.ArrayList
 
+// TODO: this class needs better error handling, will be part of task GB-55
 @Service
 class LibraryService (
   private val libraryRepository: LibraryRepository,
-  private val gameRepository: GameRepository
+  private val gameService: GameService,
+  private val gameInstanceService: GameInstanceService
 ) : IService<Library> {
 
   override fun getAll(): List<Library> {
     return libraryRepository.findAll()
   }
 
-  override fun getSingle(id: String): Library {
+  override fun getSingle(id: String): Library? {
     return libraryRepository.findOneById(ObjectId(id))
+  }
+
+  override fun getSingleByName(name: String): Library? {
+    return libraryRepository.findByName(name)
+
   }
 
   override fun create(request: Request): Library {
@@ -44,18 +52,43 @@ class LibraryService (
   }
 
   fun addToLibrary(libraryId: String, gameId: String) {
-    // todo: add to master library and possibly create new game instance
     val library = getSingle(libraryId)
-    library.games.add(gameId)
-    update(library)
+    if (library != null) {
+      library.games.add(gameId)
+      update(library)
+    }
   }
 
-  fun getGameFromLibrary(libraryId: String, gameId: String): Game? {
-    val library = libraryRepository.findOneById(ObjectId(libraryId))
-    if (!library.games.contains(gameId)) {
-      return null
+  fun deleteGameFromLibrary(libraryId: String, gameId: String) {
+    val library = getSingle(libraryId)
+    if (library != null) {
+      library.games.remove(gameId)
+      update(library)
     }
-    return gameRepository.findOneById(ObjectId(gameId))
+  }
+
+  // TODO: error handling here
+  fun getGameFromLibrary(libraryId: String, gameId: String): GameInstance? {
+    val library = libraryRepository.findOneById(ObjectId(libraryId))
+    if (library != null && !library.games.contains(gameId)) {
+        return null
+      }
+    val game = gameService.getSingle(gameId)
+    if (game == null) {
+      val gameInstance = gameInstanceService.getSingle(gameId)
+      return gameInstance?.name?.let { gameInstanceService.getSingleByName(it) }
+    }
+    return gameInstanceService.getSingleByName(game.name)
+  }
+
+  fun convertLibraryToResponse(library: Library): LibraryResponse {
+    if (library.games.size > 0) {
+      val games: List<GameInstance> = library.games.map { gameId -> getGameFromLibrary(library.id, gameId)!! }
+      val gameResponses = games.map { game -> GameResponse(game.id, game.name) }
+      return LibraryResponse(id = library.id, name = library.name, games = gameResponses)
+    } else {
+      return LibraryResponse(id = library.id, name = library.name, games = emptyList());
+    }
   }
 
 }

@@ -1,8 +1,9 @@
 package com.gamingbacklog.api.gamingbacklogapi.controllers
 
-import com.gamingbacklog.api.gamingbacklogapi.models.Game
+import com.gamingbacklog.api.gamingbacklogapi.models.GameInstance
 import com.gamingbacklog.api.gamingbacklogapi.models.Library
-import com.gamingbacklog.api.gamingbacklogapi.requests.LibraryRequest
+import com.gamingbacklog.api.gamingbacklogapi.models.requests.LibraryRequest
+import com.gamingbacklog.api.gamingbacklogapi.models.responses.LibraryResponse
 import com.gamingbacklog.api.gamingbacklogapi.services.LibraryService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -12,12 +13,24 @@ import java.util.*
 @RestController
 @RequestMapping("/libraries")
 class LibraryController(private val libraryService: LibraryService) {
+
+  @CrossOrigin(origins = ["http://localhost:3000"])
   @GetMapping("/")
-  fun getLibraries(): ResponseEntity<List<Library>> {
+  fun getAllLibraries(): ResponseEntity<List<Library>> {
     val libraries = libraryService.getAll()
     return ResponseEntity.ok(libraries)
   }
 
+  @CrossOrigin(origins = ["http://localhost:3000"])
+  @GetMapping("/withGames")
+  fun getAllLibrariesWithGames(): ResponseEntity<List<LibraryResponse>> {
+    val libraries = libraryService.getAll()
+    // Needed for the frontend. Should refactor this and the one above + tests depending on what we need.
+    val librariesWithGames: List<LibraryResponse> = libraries.map { library -> libraryService.convertLibraryToResponse(library) }
+    return ResponseEntity.ok(librariesWithGames)
+  }
+
+  @CrossOrigin(origins = ["http://localhost:3000", "http://localhost:3000/libraries"])
   @GetMapping("/{id}")
   fun getSingleLibrary(
     @PathVariable("id") id: String
@@ -26,6 +39,17 @@ class LibraryController(private val libraryService: LibraryService) {
     return ResponseEntity.ok(library)
   }
 
+  @CrossOrigin(origins = ["http://localhost:3000", "http://localhost:3000/libraries"])
+  @GetMapping("/{id}/withGames")
+  fun getSingleLibraryWithGames(
+    @PathVariable("id") id: String
+  ): ResponseEntity<LibraryResponse> {
+    val library = libraryService.getSingle(id) ?: return ResponseEntity<LibraryResponse>( null, HttpStatus.NOT_FOUND)
+    val libraryResponse = libraryService.convertLibraryToResponse(library)
+    return ResponseEntity.ok(libraryResponse)
+  }
+
+  @CrossOrigin(origins = ["http://localhost:3000", "http://localhost:3000/libraries"])
   @PostMapping("/")
   fun createLibrary(
     @RequestBody libraryRequest: LibraryRequest
@@ -34,6 +58,7 @@ class LibraryController(private val libraryService: LibraryService) {
     return ResponseEntity<Library>(library, HttpStatus.CREATED)
   }
 
+  @CrossOrigin(origins = ["http://localhost:3000", "http://localhost:3000/libraries"])
   @PutMapping("/{libraryId}/addToLibrary")
   fun addToLibrary(
     @PathVariable("libraryId") libraryId: String,
@@ -44,15 +69,23 @@ class LibraryController(private val libraryService: LibraryService) {
     return ResponseEntity.ok("Successfully added game to library")
   }
 
-  // TODO: add getGameFromLibrary here
   @GetMapping("/{id}/games/{gameId}")
   fun getGameFromLibrary(
     @PathVariable("id") libraryId: String,
     @PathVariable("gameId") gameId: String
-  ): ResponseEntity<Game> {
+  ): ResponseEntity<GameInstance> {
     val game = libraryService.getGameFromLibrary(libraryId, gameId)
-      ?: return ResponseEntity<Game>( null, HttpStatus.NOT_FOUND)
-    return ResponseEntity<Game>(game, HttpStatus.OK)
+      ?: return ResponseEntity<GameInstance>( null, HttpStatus.NOT_FOUND)
+    return ResponseEntity<GameInstance>(game, HttpStatus.OK)
+  }
+
+  @DeleteMapping("/{id}/games/{gameId}")
+  fun deleteGameFromLibrary(
+    @PathVariable("id") libraryId: String,
+    @PathVariable("gameId") gameId: String
+  ): ResponseEntity<String> {
+    libraryService.deleteGameFromLibrary(libraryId, gameId)
+    return ResponseEntity.ok("Successfully deleted game $gameId from library $libraryId")
   }
 
   @DeleteMapping("/{id}")
