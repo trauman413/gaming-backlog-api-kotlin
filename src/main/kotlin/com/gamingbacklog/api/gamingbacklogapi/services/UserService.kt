@@ -26,6 +26,9 @@ class UserService(
 
   override fun create(request: Request): User? {
     val userRequest = request as UserRequest
+    if (userRequest.displayName == null || userRequest.password == null || userRequest.email == null) {
+      return null
+    }
     val user = User(
       displayName = userRequest.displayName,
       password = userRequest.password,
@@ -43,18 +46,12 @@ class UserService(
     userRepository.save(model)
   }
 
-  fun updateUserFields(id: String, newFields: Map<String, String>): User? {
+  fun updateUserFields(id: String, newFields: UserRequest): User? {
     val user = userRepository.findOneById(ObjectId(id))
     if (user != null) {
-      if (newFields.containsKey("displayName")) {
-        user.displayName = newFields["displayName"] as String
-      }
-      if (newFields.containsKey("password")) {
-        user.password = newFields["password"] as String
-      }
-      if (newFields.containsKey("email")) {
-        user.email = newFields["email"] as String
-      }
+      newFields.displayName?.let { user.displayName = newFields.displayName }
+      newFields.password?.let { user.password = newFields.password }
+      newFields.email?.let { user.email = newFields.email }
       update(user)
     }
     return user

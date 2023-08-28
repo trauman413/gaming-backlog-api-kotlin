@@ -1,6 +1,5 @@
 package com.gamingbacklog.api.gamingbacklogapi.controllers
 
-import com.gamingbacklog.api.gamingbacklogapi.models.User
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.UserRequest
 import com.gamingbacklog.api.gamingbacklogapi.models.responses.UserResponse
 import com.gamingbacklog.api.gamingbacklogapi.services.UserService
@@ -33,7 +32,7 @@ class UserController(private val userService: UserService) {
   fun createUser(
     @RequestBody userRequest: UserRequest
   ): ResponseEntity<UserResponse> {
-    val user = userService.create(userRequest) ?: return ResponseEntity(HttpStatus.FAILED_DEPENDENCY)
+    val user = userService.create(userRequest) ?: return ResponseEntity(HttpStatus.BAD_REQUEST)
     return ResponseEntity<UserResponse>(userService.convertUserToResponse(user), HttpStatus.CREATED)
   }
 
@@ -41,7 +40,7 @@ class UserController(private val userService: UserService) {
   @PatchMapping("/{id}")
   fun updateUserInfo(
     @PathVariable("id") id: String,
-    @RequestBody userRequest: Map<String, String>
+    @RequestBody userRequest: UserRequest
   ): ResponseEntity<UserResponse> {
     val user = userService.updateUserFields(id, userRequest) ?: return ResponseEntity<UserResponse>(null, HttpStatus.NOT_FOUND)
     return ResponseEntity<UserResponse>(userService.convertUserToResponse(user), HttpStatus.OK)

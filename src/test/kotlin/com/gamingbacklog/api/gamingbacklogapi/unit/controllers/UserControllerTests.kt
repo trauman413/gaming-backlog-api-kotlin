@@ -2,7 +2,6 @@ package com.gamingbacklog.api.gamingbacklogapi.unit.controllers
 
 import com.gamingbacklog.api.gamingbacklogapi.controllers.UserController
 import com.gamingbacklog.api.gamingbacklogapi.models.User
-import com.gamingbacklog.api.gamingbacklogapi.models.requests.LibraryRequest
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.UserRequest
 import com.gamingbacklog.api.gamingbacklogapi.services.UserService
 import com.google.gson.Gson
