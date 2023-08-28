@@ -9,7 +9,7 @@ interface UserRepository: MongoRepository<User, String> {
 
   fun findOneById(id: ObjectId): User?
 
-  fun findByUsername(username: String): User?
+  fun findByDisplayName(displayName: String): User?
 
   override fun deleteAll()
 }

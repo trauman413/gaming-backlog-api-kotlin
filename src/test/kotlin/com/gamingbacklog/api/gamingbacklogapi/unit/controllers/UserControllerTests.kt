@@ -44,17 +44,17 @@ class UserControllerTests {
   inner class GetUsers {
     @Test
     fun shouldReturnAllUsers() {
-      val user1 = User("id1", "username", "so secure", "test@test.com")
+      val user1 = User("id1", "displayName", "so secure", "test@test.com")
       val user2 = User("id2", "sauce1", "123456", "fun@fun.com")
       val users = listOf(user1, user2)
       given(userService.getAll()).willReturn(users)
       requestBuilder.runGetRequest(endpoint)
         .andExpect(status().isOk)
-        .andExpect(jsonPath("$[0].username", equalTo(user1.username)))
-        .andExpect(jsonPath("$[0].password", equalTo(user1.password)))
+        .andExpect(jsonPath("$[0].id", equalTo(user1.id)))
+        .andExpect(jsonPath("$[0].displayName", equalTo(user1.displayName)))
         .andExpect(jsonPath("$[0].email", equalTo(user1.email)))
-        .andExpect(jsonPath("$[1].username", equalTo(user2.username)))
-        .andExpect(jsonPath("$[1].password", equalTo(user2.password)))
+        .andExpect(jsonPath("$[1].id", equalTo(user2.id)))
+        .andExpect(jsonPath("$[1].displayName", equalTo(user2.displayName)))
         .andExpect(jsonPath("$[1].email", equalTo(user2.email)))
 
     }
@@ -65,14 +65,13 @@ class UserControllerTests {
   inner class GetSingleUser {
     @Test
     fun shouldReturnUserSuccessfully() {
-      val user = User("id1", "username", "so secure", "test@test.com")
+      val user = User("id1", "displayName", "so secure", "test@test.com")
       given(userService.getSingle(any())).willReturn(user)
       endpoint += "$id1/"
       requestBuilder.runGetRequest(endpoint)
         .andExpect(status().isOk)
         .andExpect(jsonPath("$.id", equalTo("id1")))
-        .andExpect(jsonPath("$.username", equalTo(user.username)))
-        .andExpect(jsonPath("$.password", equalTo(user.password)))
+        .andExpect(jsonPath("$.displayName", equalTo(user.displayName)))
         .andExpect(jsonPath("$.email", equalTo(user.email)))
     }
 
@@ -96,8 +95,8 @@ class UserControllerTests {
       val userRequest = UserRequest("epicsauceXD", "123", "dude@something.com")
       requestBuilder.runPostRequest(endpoint, requestToString(userRequest))
         .andExpect(status().isCreated)
-        .andExpect(jsonPath("$.username", equalTo(user.username)))
-        .andExpect(jsonPath("$.password", equalTo(user.password)))
+        .andExpect(jsonPath("$.id", equalTo(user.id)))
+        .andExpect(jsonPath("$.displayName", equalTo(user.displayName)))
         .andExpect(jsonPath("$.email", equalTo(user.email)))
     }
   }
@@ -109,11 +108,11 @@ class UserControllerTests {
     fun shouldUpdateAllFields() {
       val user = User("id1", "newCoolName", "betterPass", "email2@gmail.com")
       given(userService.updateUserFields(any(), any())).willReturn(user)
-      val fieldsUpdated = mapOf("username" to "newCoolName", "password" to "betterPass", "email" to "email2@gmail.com")
+      val fieldsUpdated = mapOf("displayName" to "newCoolName", "password" to "betterPass", "email" to "email2@gmail.com")
       requestBuilder.runPatchRequest("$endpoint/$id1/", Gson().toJson(fieldsUpdated))
         .andExpect(status().isOk)
-        .andExpect(jsonPath("$.username", equalTo(user.username)))
-        .andExpect(jsonPath("$.password", equalTo(user.password)))
+        .andExpect(jsonPath("$.id", equalTo(user.id)))
+        .andExpect(jsonPath("$.displayName", equalTo(user.displayName)))
         .andExpect(jsonPath("$.email", equalTo(user.email)))
     }
 
@@ -121,23 +120,22 @@ class UserControllerTests {
     fun shouldUpdateOnlyOneFieldPassedIn() {
       val user = User("id1", "newCoolName", "ogPass", "email@gmail.com")
       given(userService.updateUserFields(any(), any())).willReturn(user)
-      val fieldsUpdated = mapOf("username" to "newCoolName")
+      val fieldsUpdated = mapOf("displayName" to "newCoolName")
       requestBuilder.runPatchRequest("$endpoint/$id1/", Gson().toJson(fieldsUpdated))
         .andExpect(status().isOk)
-        .andExpect(jsonPath("$.username", equalTo(user.username)))
-        .andExpect(jsonPath("$.password", equalTo(user.password)))
+        .andExpect(jsonPath("$.displayName", equalTo(user.displayName)))
         .andExpect(jsonPath("$.email", equalTo(user.email)))
     }
 
     @Test
     fun shouldUpdateNoFields() {
-      val user = User("id1", "username", "ogPass", "email@gmail.com")
+      val user = User("id1", "displayName", "ogPass", "email@gmail.com")
       given(userService.updateUserFields(any(), any())).willReturn(user)
       val fieldsUpdated = emptyMap<String, String>()
       requestBuilder.runPatchRequest("$endpoint/$id1/", Gson().toJson(fieldsUpdated))
         .andExpect(status().isOk)
-        .andExpect(jsonPath("$.username", equalTo(user.username)))
-        .andExpect(jsonPath("$.password", equalTo(user.password)))
+        .andExpect(jsonPath("$.id", equalTo(user.id)))
+        .andExpect(jsonPath("$.displayName", equalTo(user.displayName)))
         .andExpect(jsonPath("$.email", equalTo(user.email)))
     }
   }
@@ -147,7 +145,7 @@ class UserControllerTests {
   inner class DeleteUser {
     @Test
     fun shouldSuccessfullyDeleteUser() {
-      val user1 = User("id1", "username", "so secure", "test@test.com")
+      val user1 = User("id1", "displayName", "so secure", "test@test.com")
       val users = arrayListOf(user1)
       given(userService.delete(any())).will {
         users.remove(user1)

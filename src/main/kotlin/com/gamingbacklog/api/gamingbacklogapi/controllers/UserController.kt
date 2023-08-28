@@ -2,6 +2,7 @@ package com.gamingbacklog.api.gamingbacklogapi.controllers
 
 import com.gamingbacklog.api.gamingbacklogapi.models.User
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.UserRequest
+import com.gamingbacklog.api.gamingbacklogapi.models.responses.UserResponse
 import com.gamingbacklog.api.gamingbacklogapi.services.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -13,8 +14,8 @@ class UserController(private val userService: UserService) {
 
   @CrossOrigin(origins = ["http://localhost:3000"])
   @GetMapping("/")
-  fun getAllUsers(): ResponseEntity<List<User>> {
-    val users = userService.getAll()
+  fun getAllUsers(): ResponseEntity<List<UserResponse>> {
+    val users = userService.getAll().map { user -> userService.convertUserToResponse(user) }
     return ResponseEntity.ok(users)
   }
 
@@ -22,18 +23,18 @@ class UserController(private val userService: UserService) {
   @GetMapping("/{id}")
   fun getSingleUser(
     @PathVariable("id") id: String
-  ): ResponseEntity<User> {
+  ): ResponseEntity<UserResponse> {
     val user = userService.getSingle(id) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
-    return ResponseEntity.ok(user)
+    return ResponseEntity.ok(userService.convertUserToResponse(user))
   }
 
   @CrossOrigin(origins = ["http://localhost:3000"])
   @PostMapping("/")
   fun createUser(
     @RequestBody userRequest: UserRequest
-  ): ResponseEntity<User> {
-    val user = userService.create(userRequest)
-    return ResponseEntity<User>(user, HttpStatus.CREATED)
+  ): ResponseEntity<UserResponse> {
+    val user = userService.create(userRequest) ?: return ResponseEntity(HttpStatus.FAILED_DEPENDENCY)
+    return ResponseEntity<UserResponse>(userService.convertUserToResponse(user), HttpStatus.CREATED)
   }
 
   @CrossOrigin(origins = ["http://localhost:3000"])
@@ -41,9 +42,9 @@ class UserController(private val userService: UserService) {
   fun updateUserInfo(
     @PathVariable("id") id: String,
     @RequestBody userRequest: Map<String, String>
-  ): ResponseEntity<User> {
-    val user = userService.updateUserFields(id, userRequest) ?: return ResponseEntity<User>(null, HttpStatus.NOT_FOUND)
-    return ResponseEntity<User>(user, HttpStatus.OK)
+  ): ResponseEntity<UserResponse> {
+    val user = userService.updateUserFields(id, userRequest) ?: return ResponseEntity<UserResponse>(null, HttpStatus.NOT_FOUND)
+    return ResponseEntity<UserResponse>(userService.convertUserToResponse(user), HttpStatus.OK)
   }
 
   @CrossOrigin(origins = ["http://localhost:3000"])

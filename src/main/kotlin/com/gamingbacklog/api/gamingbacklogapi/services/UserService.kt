@@ -3,6 +3,7 @@ package com.gamingbacklog.api.gamingbacklogapi.services
 import com.gamingbacklog.api.gamingbacklogapi.models.User
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.Request
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.UserRequest
+import com.gamingbacklog.api.gamingbacklogapi.models.responses.UserResponse
 import com.gamingbacklog.api.gamingbacklogapi.repositories.UserRepository
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
@@ -20,13 +21,13 @@ class UserService(
   }
 
   override fun getSingleByName(name: String): User? {
-    return userRepository.findByUsername(name)
+    return userRepository.findByDisplayName(name)
   }
 
   override fun create(request: Request): User? {
     val userRequest = request as UserRequest
     val user = User(
-      username = userRequest.username,
+      displayName = userRequest.displayName,
       password = userRequest.password,
       email = userRequest.email
     )
@@ -45,8 +46,8 @@ class UserService(
   fun updateUserFields(id: String, newFields: Map<String, String>): User? {
     val user = userRepository.findOneById(ObjectId(id))
     if (user != null) {
-      if (newFields.containsKey("username")) {
-        user.username = newFields["username"] as String
+      if (newFields.containsKey("displayName")) {
+        user.displayName = newFields["displayName"] as String
       }
       if (newFields.containsKey("password")) {
         user.password = newFields["password"] as String
@@ -58,4 +59,8 @@ class UserService(
     }
     return user
   }
-}
+
+  fun convertUserToResponse(user: User): UserResponse {
+    return UserResponse(user.id, user.displayName, user.email)
+  }
+ }
