@@ -37,6 +37,7 @@ class UserControllerTests {
     val mockMvc = MockMvcBuilders.standaloneSetup(userController)
       .build()
     requestBuilder = RequestBuilder(mockMvc)
+    given(userService.convertUserToResponse(any())).willCallRealMethod()
   }
 
   @Nested
