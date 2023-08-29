@@ -1,5 +1,8 @@
 package com.gamingbacklog.api.gamingbacklogapi.models.responses
 
+import com.fasterxml.jackson.annotation.JsonInclude
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 class GameResponse : Response {
     var id: String
     var name: String

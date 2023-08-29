@@ -4,10 +4,11 @@ import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
-@Document("libraries")
-data class Library (
+@Document("users")
+data class User(
   @Id
   val id: String = ObjectId.get().toString(),
-  val name: String,
-  val games: ArrayList<String>
+  var displayName: String,
+  var password: String,
+  var email: String
 )
