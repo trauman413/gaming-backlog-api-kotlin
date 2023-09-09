@@ -82,12 +82,12 @@ class LibraryService (
   }
 
   fun convertLibraryToResponse(library: Library): LibraryResponse {
-    if (library.games.size > 0) {
+    return if (library.games.size > 0) {
       val games: List<GameInstance> = library.games.map { gameId -> getGameFromLibrary(library.id, gameId)!! }
       val gameResponses = games.map { game -> GameResponse(game.id, game.name) }
-      return LibraryResponse(id = library.id, name = library.name, games = gameResponses)
+      LibraryResponse(id = library.id, name = library.name, games = gameResponses)
     } else {
-      return LibraryResponse(id = library.id, name = library.name, games = emptyList());
+      LibraryResponse(id = library.id, name = library.name, games = emptyList());
     }
   }
 

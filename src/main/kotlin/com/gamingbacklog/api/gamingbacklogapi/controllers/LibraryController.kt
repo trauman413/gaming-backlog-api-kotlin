@@ -14,6 +14,7 @@ import java.util.*
 @RequestMapping("/libraries")
 class LibraryController(private val libraryService: LibraryService) {
 
+  // TODO: the following two functions can be removed given they exist now in UserController
   @CrossOrigin(origins = ["http://localhost:3000"])
   @GetMapping("/")
   fun getAllLibraries(): ResponseEntity<List<Library>> {
