@@ -31,11 +31,12 @@ class UserService(
     if (userRequest.displayName == null || userRequest.password == null || userRequest.email == null) {
       return null
     }
+    val defaultLibrary = libraryService.create(LibraryRequest("All Games", ArrayList())) // revisit name, we can call it "Default" or just "All" if we want
     val user = User(
       displayName = userRequest.displayName,
       password = userRequest.password,
       email = userRequest.email,
-      libraries = ArrayList() // TODO: decide if we want to have a few generic libraries created upon account creation
+      libraries = arrayListOf(defaultLibrary.id)
     )
     userRepository.save(user)
     return user
