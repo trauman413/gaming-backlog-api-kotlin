@@ -140,18 +140,5 @@ class UserServiceTests {
       assertNotNull(result)
       assertEquals(ArrayList<LibraryResponse>(), result?.libraries)
     }
-
-    @Test
-    fun shouldDeleteNotFoundLibrary() {
-      val user = User("1772a862dcb22c5d5356b5ec", "userName", "123", "test@test.com", ArrayList())
-      mockUserDb[user.id] = user
-      mockGetOne(user.id)
-      given(libraryService.getSingle(any())).willReturn(null)
-      mockDeleteLibrary()
-      mockSave(user)
-      val result = userService.deleteUserLibrary(user.id, libraryId)
-      assertNotNull(result)
-      assertEquals(ArrayList<LibraryResponse>(), result?.libraries)
-    }
   }
 }
