@@ -11,5 +11,7 @@ interface UserRepository: MongoRepository<User, String> {
 
   fun findByDisplayName(displayName: String): User?
 
+  fun findByEmail(email: String): User?
+
   override fun deleteAll()
 }

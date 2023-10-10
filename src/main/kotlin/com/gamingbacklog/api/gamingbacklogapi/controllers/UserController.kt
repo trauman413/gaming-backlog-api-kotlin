@@ -37,6 +37,17 @@ class UserController(private val userService: UserService) {
   }
 
   @CrossOrigin(origins = ["http://localhost:3000"])
+  @PostMapping("/login")
+  fun authenticateUser(
+          @RequestBody userRequest: UserRequest
+  ): ResponseEntity<UserResponse> {
+    val user = userRequest.email?.let { userService.getSingleByEmail(it) } ?: return ResponseEntity(HttpStatus.BAD_REQUEST)
+    val authenticatedUser = userService.authenticateUser(userRequest, user) ?:
+    return ResponseEntity(HttpStatus.BAD_REQUEST)
+    return ResponseEntity<UserResponse>(userService.convertUserToResponse(authenticatedUser), HttpStatus.OK)
+  }
+
+  @CrossOrigin(origins = ["http://localhost:3000"])
   @PatchMapping("/{id}")
   fun updateUserInfo(
     @PathVariable("id") id: String,
