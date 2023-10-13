@@ -85,7 +85,7 @@ class UserController(private val userService: UserService) {
     @PathVariable("userId") userId: String,
     @PathVariable("libraryId") libraryId: String
   ): ResponseEntity<UserResponse> {
-    val userRespsonse = userService.deleteUserLibrary(userId, libraryId)
+    val userResponse = userService.deleteUserLibrary(userId, libraryId)
       ?: return ResponseEntity(HttpStatus.NOT_FOUND)
     return ResponseEntity.ok(userRespsonse)
   }
