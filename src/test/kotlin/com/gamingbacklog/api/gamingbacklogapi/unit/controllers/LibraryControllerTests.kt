@@ -206,6 +206,8 @@ class LibraryControllerTests {
       val request = UpdateLibraryGamesRequest(id1)
       requestBuilder.runDeleteRequest("$endpoint$id2/games", Gson().toJson(request))
         .andExpect(status().isOk)
+      Assertions.assertFalse(library.games.contains("id1"))
+      Assertions.assertTrue(library.games.containsAll(listOf("id2", "id3")))
     }
   }
 
