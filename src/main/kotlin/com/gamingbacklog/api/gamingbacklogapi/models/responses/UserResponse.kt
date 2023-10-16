@@ -7,12 +7,15 @@ data class UserResponse(
   val id: String,
   val displayName: String,
   val password: String?,
-  val email: String
+  val email: String,
+  val libraries: List<LibraryResponse>?
 ) : Response() {
-  constructor(id: String, displayName: String, email: String) : this(
+
+  constructor(id: String, displayName: String, email: String, libraries: List<LibraryResponse>) : this(
     id = id,
     displayName = displayName,
     password = null,
-    email = email
+    email = email,
+    libraries = libraries
   )
 }

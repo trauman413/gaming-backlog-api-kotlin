@@ -39,33 +39,6 @@ class LibraryControllerTests {
   }
 
   @Nested
-  @DisplayName("Tests for getLibraries")
-  inner class GetLibraries {
-    @Test
-    fun shouldReturnAllLibraries() {
-      val library1 = Library("id1", "Backlog", ArrayList())
-      val library2 = Library("id2", "Owned Games", ArrayList())
-      library2.games.add("gameId1")
-      library2.games.add("gameId2")
-      val libraries = ArrayList<Library>()
-      libraries.add(library1)
-      libraries.add(library2)
-      given(libraryService.getAll()).willReturn(libraries)
-      requestBuilder.runGetRequest(endpoint)
-        .andExpect(status().isOk)
-        .andExpect(jsonPath("$[0].name", equalTo("Backlog")))
-        .andExpect(jsonPath("$[0].games", equalToObject(ArrayList<String>())))
-        .andExpect(jsonPath("$[0].id", equalTo("id1")))
-        .andExpect(jsonPath("$[1].name", equalTo("Owned Games")))
-        .andExpect(jsonPath("$[1].games[0]", equalTo("gameId1")))
-        .andExpect(jsonPath("$[1].games[1]", equalTo("gameId2")))
-        .andExpect(jsonPath("$[1].id", equalTo("id2")))
-    }
-  }
-
-  // TODO: Tests for getAllLibrariesWithGames
-
-  @Nested
   @DisplayName("Tests for getSingleLibrary")
   inner class GetSingleLibrary {
     @Test

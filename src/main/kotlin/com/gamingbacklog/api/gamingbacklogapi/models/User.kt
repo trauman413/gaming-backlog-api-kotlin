@@ -10,5 +10,6 @@ data class User(
   val id: String = ObjectId.get().toString(),
   var displayName: String,
   var password: String,
-  var email: String
+  var email: String,
+  var libraries: ArrayList<String> = ArrayList()
 )
