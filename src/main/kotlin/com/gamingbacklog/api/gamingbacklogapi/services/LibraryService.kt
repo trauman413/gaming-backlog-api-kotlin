@@ -51,20 +51,22 @@ class LibraryService (
     libraryRepository.save(model)
   }
 
-  fun addToLibrary(libraryId: String, gameId: String) {
+  fun addToLibrary(libraryId: String, gameId: String): Library? {
     val library = getSingle(libraryId)
     if (library != null) {
       library.games.add(gameId)
       update(library)
     }
+    return library
   }
 
-  fun deleteGameFromLibrary(libraryId: String, gameId: String) {
+  fun deleteGameFromLibrary(libraryId: String, gameId: String): Library? {
     val library = getSingle(libraryId)
     if (library != null) {
       library.games.remove(gameId)
       update(library)
     }
+    return library
   }
 
   // TODO: error handling here

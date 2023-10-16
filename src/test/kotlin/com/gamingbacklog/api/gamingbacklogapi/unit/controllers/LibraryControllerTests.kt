@@ -4,6 +4,7 @@ import com.gamingbacklog.api.gamingbacklogapi.controllers.LibraryController
 import com.gamingbacklog.api.gamingbacklogapi.models.GameInstance
 import com.gamingbacklog.api.gamingbacklogapi.models.Library
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.LibraryRequest
+import com.gamingbacklog.api.gamingbacklogapi.models.requests.UpdateLibraryGamesRequest
 import com.gamingbacklog.api.gamingbacklogapi.services.LibraryService
 import com.google.gson.Gson
 import org.hamcrest.CoreMatchers.*
@@ -101,10 +102,10 @@ class LibraryControllerTests {
       val library = Library(id2, "Backlog", ArrayList())
       given(libraryService.addToLibrary(any(), any())).will {
         library.games.add(id1)
+        library
       }
-      val map = HashMap<String, String>()
-      map["gameId"] = id1
-      requestBuilder.runPutRequest("$endpoint/$id2/addToLibrary", Gson().toJson(map))
+      val request = UpdateLibraryGamesRequest(id1)
+      requestBuilder.runPostRequest("$endpoint$id2/games", Gson().toJson(request))
         .andExpect(status().isOk)
       Assertions.assertTrue(library.games.contains(id1))
     }
@@ -171,13 +172,15 @@ class LibraryControllerTests {
     @Test
     fun shouldSuccessfullyDeleteGameFromLibrary() {
       val library = Library("library-id1", "Backlog", arrayListOf("id1", "id2", "id3"))
-      given(libraryService.deleteGameFromLibrary("library-id1", "id1")).will {
+      given(libraryService.deleteGameFromLibrary(id2, id1)).will {
         library.games.remove("id1")
+        library
       }
-      endpoint += "library-id1/games/id1"
-      requestBuilder.runDeleteRequest(endpoint)
+      val request = UpdateLibraryGamesRequest(id1)
+      requestBuilder.runDeleteRequest("$endpoint$id2/games", Gson().toJson(request))
         .andExpect(status().isOk)
-        .andExpect(content().string(containsString("Successfully deleted game id1 from library library-id")))
+      Assertions.assertFalse(library.games.contains("id1"))
+      Assertions.assertTrue(library.games.containsAll(listOf("id2", "id3")))
     }
   }
 
