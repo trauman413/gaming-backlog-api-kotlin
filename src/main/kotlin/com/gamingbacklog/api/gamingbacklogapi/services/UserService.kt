@@ -26,6 +26,10 @@ class UserService(
     return userRepository.findByDisplayName(name)
   }
 
+  fun getSingleByEmail(email: String): User? {
+    return userRepository.findByEmail(email)
+  }
+
   override fun create(request: Request): User? {
     val userRequest = request as UserRequest
     if (userRequest.displayName == null || userRequest.password == null || userRequest.email == null) {
@@ -67,6 +71,11 @@ class UserService(
     return UserResponse(user.id, user.displayName, user.email, userLibraries)
   }
 
+  fun authenticateUser(userRequest: UserRequest, user: User): User? {
+    // Super naive implementation right now :')
+    return if (user.password == userRequest.password) user else null;
+  }
+
   fun createUserLibrary(userId: String, libraryRequest: LibraryRequest): UserResponse? {
     val newLibrary = libraryService.create(libraryRequest)
     val user = getSingle(userId)
@@ -87,7 +96,5 @@ class UserService(
       return convertUserToResponse(user)
     }
     return null
-
   }
-
  }

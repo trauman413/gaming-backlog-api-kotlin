@@ -1,12 +1,11 @@
 package com.gamingbacklog.api.gamingbacklogapi.unit.controllers
 
 import com.gamingbacklog.api.gamingbacklogapi.controllers.UserController
-import com.gamingbacklog.api.gamingbacklogapi.models.Library
 import com.gamingbacklog.api.gamingbacklogapi.models.User
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.UserRequest
+import com.gamingbacklog.api.gamingbacklogapi.models.responses.UserResponse
 import com.gamingbacklog.api.gamingbacklogapi.models.responses.GameResponse
 import com.gamingbacklog.api.gamingbacklogapi.models.responses.LibraryResponse
-import com.gamingbacklog.api.gamingbacklogapi.models.responses.UserResponse
 import com.gamingbacklog.api.gamingbacklogapi.services.LibraryService
 import com.gamingbacklog.api.gamingbacklogapi.services.UserService
 import com.google.gson.Gson
@@ -108,6 +107,33 @@ class UserControllerTests {
         .andExpect(jsonPath("$.displayName", equalTo(user.displayName)))
         .andExpect(jsonPath("$.email", equalTo(user.email)))
         .andExpect(jsonPath("$.libraries", equalTo(ArrayList<String>())))
+    }
+  }
+
+  @Nested
+  @DisplayName("Tests for authenticateUser")
+  inner class AuthenticateUser {
+    @Test
+    fun shouldReturnUserWhenAuthenticationSuccessful() {
+      val userRequest = UserRequest("displayName", "so secure", "test@test.com")
+      val user = User("id1", "displayName", "so secure", "test@test.com")
+      given(userService.getSingleByEmail(any())).willReturn(user)
+      given(userService.authenticateUser(any(), any())).willReturn(user)
+      endpoint += "login/"
+      requestBuilder.runPostRequest(endpoint, requestToString(userRequest))
+              .andExpect(status().isOk)
+              .andExpect(jsonPath("$.id", equalTo("id1")))
+              .andExpect(jsonPath("$.displayName", equalTo(user.displayName)))
+              .andExpect(jsonPath("$.email", equalTo(user.email)))
+    }
+
+    @Test
+    fun shouldFailAuthentication() {
+      given(userService.getSingleByEmail(any())).willReturn(null)
+      endpoint += "login/"
+      requestBuilder.runGetRequest(endpoint)
+              .andExpect(status().isNotFound)
+              .andExpect(jsonPath("$").doesNotExist())
     }
   }
 
