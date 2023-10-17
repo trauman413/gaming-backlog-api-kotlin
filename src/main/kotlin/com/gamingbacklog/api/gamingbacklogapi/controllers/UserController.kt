@@ -43,7 +43,7 @@ class UserController(private val userService: UserService) {
   @CrossOrigin(origins = ["http://localhost:3000"])
   @PostMapping("/login")
   fun authenticateUser(
-          @RequestBody userRequest: UserRequest
+    @RequestBody userRequest: UserRequest
   ): ResponseEntity<UserResponse> {
     val user = userRequest.email?.let { userService.getSingleByEmail(it) } ?: return ResponseEntity(HttpStatus.BAD_REQUEST)
     val authenticatedUser = userService.authenticateUser(userRequest, user) ?:
@@ -98,6 +98,6 @@ class UserController(private val userService: UserService) {
   ): ResponseEntity<UserResponse> {
     val userResponse = userService.deleteUserLibrary(userId, libraryId)
       ?: return ResponseEntity(HttpStatus.NOT_FOUND)
-    return ResponseEntity.ok(userRespsonse)
+    return ResponseEntity.ok(userResponse)
   }
 }

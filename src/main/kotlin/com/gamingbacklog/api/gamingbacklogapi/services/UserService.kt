@@ -96,6 +96,5 @@ class UserService(
       return convertUserToResponse(user)
     }
     return null
-
   }
  }
