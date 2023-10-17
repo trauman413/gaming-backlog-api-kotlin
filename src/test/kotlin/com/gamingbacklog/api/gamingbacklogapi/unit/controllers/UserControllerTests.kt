@@ -4,6 +4,9 @@ import com.gamingbacklog.api.gamingbacklogapi.controllers.UserController
 import com.gamingbacklog.api.gamingbacklogapi.models.User
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.UserRequest
 import com.gamingbacklog.api.gamingbacklogapi.models.responses.UserResponse
+import com.gamingbacklog.api.gamingbacklogapi.models.responses.GameResponse
+import com.gamingbacklog.api.gamingbacklogapi.models.responses.LibraryResponse
+import com.gamingbacklog.api.gamingbacklogapi.services.LibraryService
 import com.gamingbacklog.api.gamingbacklogapi.services.UserService
 import com.google.gson.Gson
 import org.hamcrest.CoreMatchers.equalTo
@@ -26,6 +29,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 @TestPropertySource(properties = ["CLIENT_ID=test_id", "CLIENT_SECRET=test_secret"])
 class UserControllerTests {
   lateinit var userService: UserService
+  lateinit var libraryService: LibraryService
   lateinit var requestBuilder: RequestBuilder
   var endpoint = "/users/"
   var id1 = "70b664a416135a6e967fadc6"
@@ -33,6 +37,7 @@ class UserControllerTests {
   @BeforeEach
   fun configureSystem() {
     userService = mock(UserService::class.java)
+    libraryService = mock(LibraryService::class.java)
     val userController = UserController(userService)
     val mockMvc = MockMvcBuilders.standaloneSetup(userController)
       .build()
@@ -54,10 +59,11 @@ class UserControllerTests {
         .andExpect(jsonPath("$[0].id", equalTo(user1.id)))
         .andExpect(jsonPath("$[0].displayName", equalTo(user1.displayName)))
         .andExpect(jsonPath("$[0].email", equalTo(user1.email)))
+        .andExpect(jsonPath("$[0].libraries", equalTo(ArrayList<String>())))
         .andExpect(jsonPath("$[1].id", equalTo(user2.id)))
         .andExpect(jsonPath("$[1].displayName", equalTo(user2.displayName)))
         .andExpect(jsonPath("$[1].email", equalTo(user2.email)))
-
+        .andExpect(jsonPath("$[1].libraries", equalTo(ArrayList<String>())))
     }
   }
 
@@ -74,6 +80,7 @@ class UserControllerTests {
         .andExpect(jsonPath("$.id", equalTo("id1")))
         .andExpect(jsonPath("$.displayName", equalTo(user.displayName)))
         .andExpect(jsonPath("$.email", equalTo(user.email)))
+        .andExpect(jsonPath("$.libraries", equalTo(ArrayList<String>())))
     }
 
     @Test
@@ -99,6 +106,7 @@ class UserControllerTests {
         .andExpect(jsonPath("$.id", equalTo(user.id)))
         .andExpect(jsonPath("$.displayName", equalTo(user.displayName)))
         .andExpect(jsonPath("$.email", equalTo(user.email)))
+        .andExpect(jsonPath("$.libraries", equalTo(ArrayList<String>())))
     }
   }
 
@@ -142,6 +150,7 @@ class UserControllerTests {
         .andExpect(jsonPath("$.id", equalTo(user.id)))
         .andExpect(jsonPath("$.displayName", equalTo(user.displayName)))
         .andExpect(jsonPath("$.email", equalTo(user.email)))
+        .andExpect(jsonPath("$.libraries", equalTo(ArrayList<String>())))
     }
 
     @Test
@@ -153,6 +162,7 @@ class UserControllerTests {
         .andExpect(status().isOk)
         .andExpect(jsonPath("$.displayName", equalTo(user.displayName)))
         .andExpect(jsonPath("$.email", equalTo(user.email)))
+        .andExpect(jsonPath("$.libraries", equalTo(ArrayList<String>())))
     }
 
     @Test
@@ -165,6 +175,7 @@ class UserControllerTests {
         .andExpect(jsonPath("$.id", equalTo(user.id)))
         .andExpect(jsonPath("$.displayName", equalTo(user.displayName)))
         .andExpect(jsonPath("$.email", equalTo(user.email)))
+        .andExpect(jsonPath("$.libraries", equalTo(ArrayList<String>())))
     }
   }
 
@@ -181,6 +192,41 @@ class UserControllerTests {
       requestBuilder.runDeleteRequest("$endpoint/$id1")
         .andExpect(status().isNoContent)
       Assertions.assertTrue(users.isEmpty())
+    }
+  }
+
+  @Nested
+  @DisplayName("Tests for getAllUserLibraries")
+  inner class GetAllUserLibraryTests {
+    @Test
+    fun shouldReturnEmptyList() {
+      val user = User("id1", "displayName", "so secure", "test@test.com")
+      given(userService.getSingle(any())).willReturn(user)
+      requestBuilder.runGetRequest("$endpoint/$id1/libraries")
+        .andExpect(status().isOk)
+        .andExpect(jsonPath("$", equalTo(ArrayList<LibraryResponse>())))
+    }
+
+    @Test
+    fun shouldReturnAllLibraries() {
+      val user = User("id1", "displayName", "so secure", "test@test.com")
+      val library1 = LibraryResponse("libid1", "Backlog", listOf(GameResponse("gameid1", "Sea of Stars")))
+      user.libraries.add(library1.id)
+      given(userService.getSingle(any())).willReturn(user)
+      given(userService.convertUserToResponse(any())).willReturn(UserResponse(user.id, user.displayName, user.email, arrayListOf(library1)))
+      requestBuilder.runGetRequest("$endpoint/$id1/libraries")
+        .andExpect(status().isOk)
+        .andExpect(jsonPath("$[0].id", equalTo(library1.id)))
+        .andExpect(jsonPath("$[0].name", equalTo(library1.name)))
+        .andExpect(jsonPath("$[0].games[0].id", equalTo(library1.games[0].id)))
+        .andExpect(jsonPath("$[0].games[0].name", equalTo(library1.games[0].name)))
+    }
+
+    @Test
+    fun shouldReturnNull() {
+      given(userService.getSingle(any())).willReturn(null)
+      requestBuilder.runGetRequest("$endpoint/$id1/libraries")
+        .andExpect(status().isNotFound)
     }
   }
 

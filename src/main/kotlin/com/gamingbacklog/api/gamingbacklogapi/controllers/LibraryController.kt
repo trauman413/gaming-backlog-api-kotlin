@@ -3,6 +3,7 @@ package com.gamingbacklog.api.gamingbacklogapi.controllers
 import com.gamingbacklog.api.gamingbacklogapi.models.GameInstance
 import com.gamingbacklog.api.gamingbacklogapi.models.Library
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.LibraryRequest
+import com.gamingbacklog.api.gamingbacklogapi.models.requests.UpdateLibraryGamesRequest
 import com.gamingbacklog.api.gamingbacklogapi.models.responses.LibraryResponse
 import com.gamingbacklog.api.gamingbacklogapi.services.LibraryService
 import org.springframework.http.HttpStatus
@@ -13,22 +14,6 @@ import java.util.*
 @RestController
 @RequestMapping("/libraries")
 class LibraryController(private val libraryService: LibraryService) {
-
-  @CrossOrigin(origins = ["http://localhost:3000"])
-  @GetMapping("/")
-  fun getAllLibraries(): ResponseEntity<List<Library>> {
-    val libraries = libraryService.getAll()
-    return ResponseEntity.ok(libraries)
-  }
-
-  @CrossOrigin(origins = ["http://localhost:3000"])
-  @GetMapping("/withGames")
-  fun getAllLibrariesWithGames(): ResponseEntity<List<LibraryResponse>> {
-    val libraries = libraryService.getAll()
-    // Needed for the frontend. Should refactor this and the one above + tests depending on what we need.
-    val librariesWithGames: List<LibraryResponse> = libraries.map { library -> libraryService.convertLibraryToResponse(library) }
-    return ResponseEntity.ok(librariesWithGames)
-  }
 
   @CrossOrigin(origins = ["http://localhost:3000", "http://localhost:3000/libraries"])
   @GetMapping("/{id}")
@@ -59,14 +44,14 @@ class LibraryController(private val libraryService: LibraryService) {
   }
 
   @CrossOrigin(origins = ["http://localhost:3000", "http://localhost:3000/libraries"])
-  @PutMapping("/{libraryId}/addToLibrary")
+  @PostMapping("/{libraryId}/games")
   fun addToLibrary(
     @PathVariable("libraryId") libraryId: String,
-    @RequestBody addGameToLibrary: Map<String, String>
-  ): ResponseEntity<String> {
-    val gameId = addGameToLibrary["gameId"] ?: throw Exception("gameId must be provided")
-    libraryService.addToLibrary(libraryId, gameId)
-    return ResponseEntity.ok("Successfully added game to library")
+    @RequestBody addGameToLibrary: UpdateLibraryGamesRequest
+  ): ResponseEntity<LibraryResponse> {
+    val library = libraryService.addToLibrary(libraryId, addGameToLibrary.gameId)
+      ?: return ResponseEntity<LibraryResponse>(HttpStatus.NOT_FOUND)
+    return ResponseEntity.ok(libraryService.convertLibraryToResponse(library))
   }
 
   @GetMapping("/{id}/games/{gameId}")
@@ -79,13 +64,14 @@ class LibraryController(private val libraryService: LibraryService) {
     return ResponseEntity<GameInstance>(game, HttpStatus.OK)
   }
 
-  @DeleteMapping("/{id}/games/{gameId}")
+  @DeleteMapping("/{id}/games")
   fun deleteGameFromLibrary(
     @PathVariable("id") libraryId: String,
-    @PathVariable("gameId") gameId: String
-  ): ResponseEntity<String> {
-    libraryService.deleteGameFromLibrary(libraryId, gameId)
-    return ResponseEntity.ok("Successfully deleted game $gameId from library $libraryId")
+    @RequestBody removeGameFromLibrary: UpdateLibraryGamesRequest
+  ): ResponseEntity<LibraryResponse> {
+    val library = libraryService.deleteGameFromLibrary(libraryId, removeGameFromLibrary.gameId)
+      ?: return ResponseEntity<LibraryResponse>(HttpStatus.NOT_FOUND)
+    return ResponseEntity.ok(libraryService.convertLibraryToResponse(library))
   }
 
   @DeleteMapping("/{id}")

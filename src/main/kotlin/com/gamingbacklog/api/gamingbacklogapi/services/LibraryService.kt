@@ -51,20 +51,22 @@ class LibraryService (
     libraryRepository.save(model)
   }
 
-  fun addToLibrary(libraryId: String, gameId: String) {
+  fun addToLibrary(libraryId: String, gameId: String): Library? {
     val library = getSingle(libraryId)
     if (library != null) {
       library.games.add(gameId)
       update(library)
     }
+    return library
   }
 
-  fun deleteGameFromLibrary(libraryId: String, gameId: String) {
+  fun deleteGameFromLibrary(libraryId: String, gameId: String): Library? {
     val library = getSingle(libraryId)
     if (library != null) {
       library.games.remove(gameId)
       update(library)
     }
+    return library
   }
 
   // TODO: error handling here
@@ -82,12 +84,12 @@ class LibraryService (
   }
 
   fun convertLibraryToResponse(library: Library): LibraryResponse {
-    if (library.games.size > 0) {
+    return if (library.games.size > 0) {
       val games: List<GameInstance> = library.games.map { gameId -> getGameFromLibrary(library.id, gameId)!! }
       val gameResponses = games.map { game -> GameResponse(game.id, game.name) }
-      return LibraryResponse(id = library.id, name = library.name, games = gameResponses)
+      LibraryResponse(id = library.id, name = library.name, games = gameResponses)
     } else {
-      return LibraryResponse(id = library.id, name = library.name, games = emptyList());
+      LibraryResponse(id = library.id, name = library.name, games = emptyList());
     }
   }
 
