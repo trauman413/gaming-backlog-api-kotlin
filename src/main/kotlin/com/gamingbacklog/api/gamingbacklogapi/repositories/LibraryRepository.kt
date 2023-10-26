@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.repository.MongoRepository
 interface LibraryRepository : MongoRepository<Library, String> {
   fun findOneById(id: ObjectId): Library?
   fun findByName(name: String): Library?
+  fun findByIdIn(ids: List<ObjectId>): Array<Library>?
   override fun deleteAll()
 
 }

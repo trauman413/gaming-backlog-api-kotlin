@@ -6,6 +6,7 @@ import com.gamingbacklog.api.gamingbacklogapi.models.requests.LibraryRequest
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.UpdateLibraryGamesRequest
 import com.gamingbacklog.api.gamingbacklogapi.models.responses.LibraryResponse
 import com.gamingbacklog.api.gamingbacklogapi.services.LibraryService
+import com.gamingbacklog.api.gamingbacklogapi.services.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -13,7 +14,15 @@ import java.util.*
 
 @RestController
 @RequestMapping("/libraries")
-class LibraryController(private val libraryService: LibraryService) {
+class LibraryController(private val libraryService: LibraryService, private val userService: UserService) {
+  @CrossOrigin(origins = ["http://localhost:3000", "http://localhost:3000/libraries"])
+  @GetMapping("/users/{userId}/withGames")
+  fun getUserLibrariesWithGames(@PathVariable("userId") userId: String): ResponseEntity<List<LibraryResponse>> {
+    val user = userService.getSingle(userId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
+    val libraries = libraryService.getByIds(user.libraries) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
+    val librariesWithGames: List<LibraryResponse> = libraries.map { library -> libraryService.convertLibraryToResponse(library) }
+    return ResponseEntity.ok(librariesWithGames)
+  }
 
   @CrossOrigin(origins = ["http://localhost:3000", "http://localhost:3000/libraries"])
   @GetMapping("/{id}")

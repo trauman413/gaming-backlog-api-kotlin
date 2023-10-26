@@ -51,6 +51,10 @@ class LibraryService (
     libraryRepository.save(model)
   }
 
+  fun getByIds(ids: List<String>): Array<Library>? {
+    return libraryRepository.findByIdIn(ids.map { id -> ObjectId(id) });
+  }
+
   fun addToLibrary(libraryId: String, gameId: String): Library? {
     val library = getSingle(libraryId)
     if (library != null) {
