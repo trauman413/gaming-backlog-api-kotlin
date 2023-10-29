@@ -1,6 +1,7 @@
 package com.gamingbacklog.api.gamingbacklogapi.services
 
 import com.gamingbacklog.api.gamingbacklogapi.models.User
+import com.gamingbacklog.api.gamingbacklogapi.models.requests.LibraryRequest
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.Request
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.UserRequest
 import com.gamingbacklog.api.gamingbacklogapi.models.responses.UserResponse
@@ -10,7 +11,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class UserService(
-  private val userRepository: UserRepository
+  private val userRepository: UserRepository,
+  private val libraryService: LibraryService
 ): IService<User> {
   override fun getAll(): List<User> {
     return userRepository.findAll()
@@ -24,15 +26,21 @@ class UserService(
     return userRepository.findByDisplayName(name)
   }
 
+  fun getSingleByEmail(email: String): User? {
+    return userRepository.findByEmail(email)
+  }
+
   override fun create(request: Request): User? {
     val userRequest = request as UserRequest
     if (userRequest.displayName == null || userRequest.password == null || userRequest.email == null) {
       return null
     }
+    val defaultLibrary = libraryService.create(LibraryRequest("All Games", ArrayList())) // revisit name, we can call it "Default" or just "All" if we want
     val user = User(
       displayName = userRequest.displayName,
       password = userRequest.password,
-      email = userRequest.email
+      email = userRequest.email,
+      libraries = arrayListOf(defaultLibrary.id)
     )
     userRepository.save(user)
     return user
@@ -58,7 +66,36 @@ class UserService(
   }
 
   fun convertUserToResponse(user: User, includePassword: Boolean = false): UserResponse {
-    return if (includePassword) UserResponse(user.id, user.displayName, user.password, user.email)
-      else UserResponse(user.id, user.displayName, user.email)
+    // might want to have better error handling later without !!
+    val userLibraries = user.libraries.map { libraryService.convertLibraryToResponse(libraryService.getSingle(it)!!) }
+    return if (includePassword) UserResponse(user.id, user.displayName, user.password, user.email, userLibraries)
+    else UserResponse(user.id, user.displayName, user.email, userLibraries)
+  }
+
+  fun authenticateUser(userRequest: UserRequest, user: User): User? {
+    // Super naive implementation right now :')
+    return if (user.password == userRequest.password) user else null;
+  }
+
+  fun createUserLibrary(userId: String, libraryRequest: LibraryRequest): UserResponse? {
+    val newLibrary = libraryService.create(libraryRequest)
+    val user = getSingle(userId)
+    if (user != null) {
+      user.libraries.add(newLibrary.id)
+      update(user)
+      return convertUserToResponse(user)
+    }
+    return null
+  }
+
+  fun deleteUserLibrary(userId: String, libraryId: String): UserResponse? {
+    val user = getSingle(userId)
+    if (user != null) {
+      libraryService.delete(libraryId)
+      user.libraries.remove(libraryId)
+      update(user)
+      return convertUserToResponse(user)
+    }
+    return null
   }
  }
