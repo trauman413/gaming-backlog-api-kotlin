@@ -57,7 +57,8 @@ class UserService(
     return user
   }
 
-  fun convertUserToResponse(user: User): UserResponse {
-    return UserResponse(user.id, user.displayName, user.email)
+  fun convertUserToResponse(user: User, includePassword: Boolean = false): UserResponse {
+    return if (includePassword) UserResponse(user.id, user.displayName, user.password, user.email)
+      else UserResponse(user.id, user.displayName, user.email)
   }
  }

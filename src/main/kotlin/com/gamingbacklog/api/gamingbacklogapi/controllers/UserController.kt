@@ -21,10 +21,11 @@ class UserController(private val userService: UserService) {
   @CrossOrigin(origins = ["http://localhost:3000"])
   @GetMapping("/{id}")
   fun getSingleUser(
-    @PathVariable("id") id: String
+    @PathVariable("id") id: String,
+    @RequestParam(name = "includePassword", defaultValue = "false") includePassword: Boolean
   ): ResponseEntity<UserResponse> {
     val user = userService.getSingle(id) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
-    return ResponseEntity.ok(userService.convertUserToResponse(user))
+    return ResponseEntity.ok(userService.convertUserToResponse(user, includePassword))
   }
 
   @CrossOrigin(origins = ["http://localhost:3000"])
