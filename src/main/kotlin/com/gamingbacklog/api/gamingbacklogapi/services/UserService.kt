@@ -65,10 +65,11 @@ class UserService(
     return user
   }
 
-  fun convertUserToResponse(user: User): UserResponse {
+  fun convertUserToResponse(user: User, includePassword: Boolean = false): UserResponse {
     // might want to have better error handling later without !!
     val userLibraries = user.libraries.map { libraryService.convertLibraryToResponse(libraryService.getSingle(it)!!) }
-    return UserResponse(user.id, user.displayName, user.email, userLibraries)
+    return if (includePassword) UserResponse(user.id, user.displayName, user.password, user.email, userLibraries)
+    else UserResponse(user.id, user.displayName, user.email, userLibraries)
   }
 
   fun authenticateUser(userRequest: UserRequest, user: User): User? {

@@ -42,7 +42,7 @@ class UserControllerTests {
     val mockMvc = MockMvcBuilders.standaloneSetup(userController)
       .build()
     requestBuilder = RequestBuilder(mockMvc)
-    given(userService.convertUserToResponse(any())).willCallRealMethod()
+    given(userService.convertUserToResponse(any(), any())).willCallRealMethod()
   }
 
   @Nested
@@ -213,7 +213,7 @@ class UserControllerTests {
       val library1 = LibraryResponse("libid1", "Backlog", listOf(GameResponse("gameid1", "Sea of Stars")))
       user.libraries.add(library1.id)
       given(userService.getSingle(any())).willReturn(user)
-      given(userService.convertUserToResponse(any())).willReturn(UserResponse(user.id, user.displayName, user.email, arrayListOf(library1)))
+      given(userService.convertUserToResponse(any(), any())).willReturn(UserResponse(user.id, user.displayName, user.email, arrayListOf(library1)))
       requestBuilder.runGetRequest("$endpoint/$id1/libraries")
         .andExpect(status().isOk)
         .andExpect(jsonPath("$[0].id", equalTo(library1.id)))
