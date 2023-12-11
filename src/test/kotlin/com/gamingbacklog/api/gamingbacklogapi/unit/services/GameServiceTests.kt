@@ -42,7 +42,7 @@ class GameServiceTests {
     }
 
     @Test
-    fun shouldSuccessfullyConvert() {
+    fun shouldSuccessfullyConvertWithAllFields() {
       val igdbGame = IGDBGame(
         id = 254339,
         artworks = listOf(ArtworkInfo(1, "link1"), ArtworkInfo(2, "link2")),

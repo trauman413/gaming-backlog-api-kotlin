@@ -49,27 +49,33 @@ class LibraryServiceTests {
     mockLibraryDb.clear()
   }
 
+  fun saveMockLibraryDB(libraryId: String, libraryName: String, gameIds: ArrayList<String>) {
+    mockLibraryDb[libraryId] = Library(libraryId, libraryName, gameIds)
+    mockGetOne(libraryId)
+    mockLibraryDb[libraryId]?.let { mockSave(it) }
+  }
+
   @Nested
   @DisplayName("Tests for createLibrary")
   inner class CreateLibrary {
-    @Test
-    fun shouldCreateLibraryWithNoGames() {
-      val library = Library(libraryId, "Backlog", arrayListOf())
+
+    private fun testCreateLibraryUtil(libraryId: String, libraryName: String, gameIds: ArrayList<String>) {
+      val library = Library(libraryId, libraryName, gameIds)
+      val request = LibraryRequest(libraryName, gameIds)
       mockSave(library)
-      val request = LibraryRequest("Backlog", arrayListOf())
       val result = libraryService.create(request)
       assertEquals(library.name, result.name)
       assertEquals(library.games, result.games)
+
+    }
+    @Test
+    fun shouldCreateLibraryWithNoGames() {
+      testCreateLibraryUtil(libraryId, "Backlog", arrayListOf())
     }
 
     @Test
     fun shouldCreateLibraryWithGames() {
-      val library = Library(libraryId, "Backlog", arrayListOf(gameId1))
-      mockSave(library)
-      val request = LibraryRequest("Backlog", arrayListOf(gameId1))
-      val result = libraryService.create(request)
-      assertEquals(library.name, result.name)
-      assertEquals(library.games, result.games)
+      testCreateLibraryUtil(libraryId, "Backlog", arrayListOf(gameId1))
     }
   }
 
@@ -78,10 +84,8 @@ class LibraryServiceTests {
   inner class AddToLibrary {
     @Test
     fun shouldAddToLibrary() {
-      mockLibraryDb[libraryId] = Library(libraryId, "Backlog", arrayListOf())
-      mockGetOne(libraryId)
+      saveMockLibraryDB(libraryId, "Backlog", arrayListOf())
       mockLibraryDb[libraryId]?.games?.add(gameId1)
-      mockLibraryDb[libraryId]?.let { mockSave(it) }
       val result = libraryService.addToLibrary(libraryId, gameId1)
       assertEquals(mockLibraryDb[libraryId], result)
     }
@@ -98,10 +102,8 @@ class LibraryServiceTests {
   inner class DeleteGameFromLibrary {
     @Test
     fun shouldDeleteGameFromLibrary() {
-      mockLibraryDb[libraryId] = Library(libraryId, "Backlog", arrayListOf(gameId1))
-      mockGetOne(libraryId)
+      saveMockLibraryDB(libraryId, "Backlog", arrayListOf(gameId1))
       mockLibraryDb[libraryId]?.games?.remove(gameId1)
-      mockLibraryDb[libraryId]?.let { mockSave(it) }
       val result = libraryService.deleteGameFromLibrary(libraryId, gameId1)
       assertEquals(mockLibraryDb[libraryId], result)
     }
@@ -111,6 +113,5 @@ class LibraryServiceTests {
       val result = libraryService.deleteGameFromLibrary(libraryId, gameId1)
       assertEquals(null, result)
     }
-
   }
 }

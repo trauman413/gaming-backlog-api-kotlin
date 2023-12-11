@@ -85,7 +85,17 @@ class UserServiceTests {
       assertEquals(user.libraries, result?.libraries)
     }
 
-    // No tests for if fields are null because they can't actually be null
+    @Test
+    fun shouldNotCreateUserWithNullFields() {
+      val result = userService.create(UserRequest(null, null, null))
+      assertNull(result)
+    }
+
+    @Test
+    fun shouldNotCreateUserWithOneNullField() {
+      val result = userService.create(UserRequest("something", null, "email@email.com"))
+      assertNull(result)
+    }
   }
 
   @Nested
@@ -144,11 +154,17 @@ class UserServiceTests {
   @Nested
   @DisplayName("Tests for updateUserFields")
   inner class UpdateUserFields {
-    @Test
-    fun shouldUpdateAllUserFields() {
-      val ogUser = User("1772a862dcb22c5d5356b5ec", "userName", "123", "test@test.com", arrayListOf(libraryId))
+
+    private fun createMockUserDB(userId: String, displayName: String, password: String, email: String, libraryIds: ArrayList<String>): User {
+      val ogUser = User(userId, displayName, password, email, libraryIds)
       mockUserDb[ogUser.id] = User(ogUser.id, "user2", "456", "newtest@test.com")
       mockGetOne(ogUser.id)
+      return ogUser
+    }
+
+    @Test
+    fun shouldUpdateAllUserFields() {
+      val ogUser = createMockUserDB("1772a862dcb22c5d5356b5ec", "userName", "123", "test@test.com", arrayListOf(libraryId))
       val updateRequest = UserRequest("user2", "456", "newtest@test.com")
       val result = userService.updateUserFields(ogUser.id, updateRequest)
       assertEquals(mockUserDb[ogUser.id]?.displayName, result?.displayName)
@@ -159,9 +175,7 @@ class UserServiceTests {
 
     @Test
     fun shouldUpdatePartialUserFields() {
-      val ogUser = User("1772a862dcb22c5d5356b5ec", "userName", "123", "test@test.com", arrayListOf(libraryId))
-      mockUserDb[ogUser.id] = User(ogUser.id, "user2", "123", "newtest@test.com")
-      mockGetOne(ogUser.id)
+      val ogUser = createMockUserDB("1772a862dcb22c5d5356b5ec", "userName", "123", "test@test.com", arrayListOf(libraryId))
       val updateRequest = UserRequest(displayName = "user2", password = null, email = "newtest@test.com")
       val result = userService.updateUserFields(ogUser.id, updateRequest)
       assertEquals(mockUserDb[ogUser.id]?.displayName, result?.displayName)
