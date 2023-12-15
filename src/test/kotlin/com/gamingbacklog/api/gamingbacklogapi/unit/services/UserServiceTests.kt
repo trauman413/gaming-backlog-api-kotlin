@@ -185,7 +185,7 @@ class UserServiceTests {
     }
 
     @Test
-    fun shouldFindNoUser() {
+    fun shouldFindNoUserToUpdateInDB() {
       val user = userService.updateUserFields("1772a862dcb22c5d5356b5ec", UserRequest(displayName = "user2", password = null, email = "newtest@test.com"))
       assertNull(user)
     }

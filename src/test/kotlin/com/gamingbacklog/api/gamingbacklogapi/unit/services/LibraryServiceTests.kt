@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.mockito.kotlin.given
-import org.mockito.kotlin.verify
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.TestPropertySource
 
@@ -40,7 +39,7 @@ class LibraryServiceTests {
     }
   }
 
-  fun mockGetOne(libraryId: String) {
+  private fun mockGetOne(libraryId: String) {
     given(libraryRepository.findOneById(ObjectId(libraryId))).willReturn(mockLibraryDb[libraryId])
   }
 
@@ -91,7 +90,7 @@ class LibraryServiceTests {
     }
 
     @Test
-    fun shouldAddToLibraryNoIDFound() {
+    fun shouldNotAddToLibraryIfNoIDFound() {
       val result = libraryService.addToLibrary(libraryId, gameId1)
       assertEquals(null, result)
     }

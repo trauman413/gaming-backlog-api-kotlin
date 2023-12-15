@@ -1,7 +1,11 @@
 package com.gamingbacklog.api.gamingbacklogapi.unit.services
 
 import com.gamingbacklog.api.gamingbacklogapi.clients.IGDBClient
-import com.gamingbacklog.api.gamingbacklogapi.models.igdb.*
+import com.gamingbacklog.api.gamingbacklogapi.models.igdb.ReleaseDate
+import com.gamingbacklog.api.gamingbacklogapi.models.igdb.ArtworkInfo
+import com.gamingbacklog.api.gamingbacklogapi.models.igdb.FieldInfo
+import com.gamingbacklog.api.gamingbacklogapi.models.igdb.IGDBGame
+import com.gamingbacklog.api.gamingbacklogapi.models.igdb.CompanyFieldInfo
 import com.gamingbacklog.api.gamingbacklogapi.repositories.GameRepository
 import com.gamingbacklog.api.gamingbacklogapi.services.GameService
 import org.junit.jupiter.api.Assertions.assertEquals
