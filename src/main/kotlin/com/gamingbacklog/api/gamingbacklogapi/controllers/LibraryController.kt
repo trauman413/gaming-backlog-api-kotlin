@@ -2,6 +2,7 @@ package com.gamingbacklog.api.gamingbacklogapi.controllers
 
 import com.gamingbacklog.api.gamingbacklogapi.models.GameInstance
 import com.gamingbacklog.api.gamingbacklogapi.models.Library
+import com.gamingbacklog.api.gamingbacklogapi.models.enums.LibraryStatus
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.LibraryRequest
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.UpdateLibraryGamesRequest
 import com.gamingbacklog.api.gamingbacklogapi.models.responses.LibraryResponse
@@ -45,9 +46,12 @@ class LibraryController(private val libraryService: LibraryService) {
     @PathVariable("libraryId") libraryId: String,
     @RequestBody addGameToLibrary: UpdateLibraryGamesRequest
   ): ResponseEntity<LibraryResponse> {
-    val library = libraryService.addToLibrary(libraryId, addGameToLibrary.gameId)
-      ?: return ResponseEntity<LibraryResponse>(HttpStatus.NOT_FOUND)
-    return ResponseEntity.ok(libraryService.convertLibraryToResponse(library))
+    val libraryResult = libraryService.addToLibrary(libraryId, addGameToLibrary.gameId)
+    return when (libraryResult.libraryStatus) {
+      LibraryStatus.SUCCESS -> ResponseEntity.ok(libraryResult.library?.let { libraryService.convertLibraryToResponse(it) })
+      LibraryStatus.LIBRARY_DOES_NOT_EXIST -> ResponseEntity<LibraryResponse>(HttpStatus.NOT_FOUND)
+      LibraryStatus.DUPLICATE_NOT_ADDED -> ResponseEntity<LibraryResponse>(HttpStatus.BAD_REQUEST)
+    }
   }
 
   @GetMapping("/{id}/games/{gameId}")

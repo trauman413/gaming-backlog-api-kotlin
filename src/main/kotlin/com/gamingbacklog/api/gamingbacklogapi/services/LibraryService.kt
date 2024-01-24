@@ -2,11 +2,13 @@ package com.gamingbacklog.api.gamingbacklogapi.services
 
 import com.gamingbacklog.api.gamingbacklogapi.models.GameInstance
 import com.gamingbacklog.api.gamingbacklogapi.models.Library
+import com.gamingbacklog.api.gamingbacklogapi.models.enums.LibraryStatus
 import com.gamingbacklog.api.gamingbacklogapi.repositories.LibraryRepository
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.LibraryRequest
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.Request
 import com.gamingbacklog.api.gamingbacklogapi.models.responses.GameResponse
 import com.gamingbacklog.api.gamingbacklogapi.models.responses.LibraryResponse
+import com.gamingbacklog.api.gamingbacklogapi.models.results.LibraryResult
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import java.util.ArrayList
@@ -51,13 +53,17 @@ class LibraryService (
     libraryRepository.save(model)
   }
 
-  fun addToLibrary(libraryId: String, gameId: String): Library? {
+  fun addToLibrary(libraryId: String, gameId: String): LibraryResult {
     val library = getSingle(libraryId)
     if (library != null) {
+      if (library.games.contains(gameId)) {
+        return LibraryResult(library, LibraryStatus.DUPLICATE_NOT_ADDED)
+      }
       library.games.add(gameId)
       update(library)
+      return LibraryResult(library, LibraryStatus.SUCCESS)
     }
-    return library
+    return LibraryResult(null, LibraryStatus.LIBRARY_DOES_NOT_EXIST)
   }
 
   fun deleteGameFromLibrary(libraryId: String, gameId: String): Library? {
