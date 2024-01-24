@@ -32,7 +32,6 @@ class GameController(
    *
    */
   @GetMapping("/{id}")
-  @CrossOrigin(origins = ["http://localhost:3000"])
   fun getSingleGame(
     @PathVariable("id") id: String
   ): ResponseEntity<Game> {

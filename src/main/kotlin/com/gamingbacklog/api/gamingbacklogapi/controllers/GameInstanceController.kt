@@ -27,7 +27,6 @@ class GameInstanceController(
    *
    */
   @GetMapping("/{id}")
-  @CrossOrigin(origins = ["http://localhost:3000"])
   fun getSingleGameInstance(
     @PathVariable("id") id: String
   ): ResponseEntity<GameInstance> {

@@ -5,7 +5,6 @@ import com.gamingbacklog.api.gamingbacklogapi.models.requests.UserRequest
 import com.gamingbacklog.api.gamingbacklogapi.models.responses.LibraryResponse
 import com.gamingbacklog.api.gamingbacklogapi.models.responses.UserResponse
 import com.gamingbacklog.api.gamingbacklogapi.services.UserService
-import org.springframework.data.repository.query.Param
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/users")
 class UserController(private val userService: UserService) {
 
-  @CrossOrigin(origins = ["http://localhost:3000"])
   @GetMapping("/")
   fun getAllUsers(
   ): ResponseEntity<List<UserResponse>> {
@@ -22,7 +20,6 @@ class UserController(private val userService: UserService) {
     return ResponseEntity.ok(users)
   }
 
-  @CrossOrigin(origins = ["http://localhost:3000"])
   @GetMapping("/{id}")
   fun getSingleUser(
     @PathVariable("id") id: String,
@@ -32,7 +29,6 @@ class UserController(private val userService: UserService) {
     return ResponseEntity.ok(userService.convertUserToResponse(user, includePassword))
   }
 
-  @CrossOrigin(origins = ["http://localhost:3000"])
   @PostMapping("/")
   fun createUser(
     @RequestBody userRequest: UserRequest
@@ -41,7 +37,6 @@ class UserController(private val userService: UserService) {
     return ResponseEntity<UserResponse>(userService.convertUserToResponse(user), HttpStatus.CREATED)
   }
 
-  @CrossOrigin(origins = ["http://localhost:3000"])
   @PostMapping("/login")
   fun authenticateUser(
     @RequestBody userRequest: UserRequest
@@ -52,7 +47,6 @@ class UserController(private val userService: UserService) {
     return ResponseEntity<UserResponse>(userService.convertUserToResponse(authenticatedUser), HttpStatus.OK)
   }
 
-  @CrossOrigin(origins = ["http://localhost:3000"])
   @PatchMapping("/{id}")
   fun updateUserInfo(
     @PathVariable("id") id: String,
@@ -62,7 +56,6 @@ class UserController(private val userService: UserService) {
     return ResponseEntity<UserResponse>(userService.convertUserToResponse(user), HttpStatus.OK)
   }
 
-  @CrossOrigin(origins = ["http://localhost:3000"])
   @DeleteMapping("/{id}")
   fun deleteUser(
     @PathVariable("id") id: String,
@@ -71,7 +64,6 @@ class UserController(private val userService: UserService) {
     return ResponseEntity(HttpStatus.NO_CONTENT)
   }
 
-  @CrossOrigin(origins = ["http://localhost:3000"])
   @GetMapping("/{userId}/libraries")
   fun getAllUserLibraries(
     @PathVariable("userId") userId: String,
@@ -80,7 +72,6 @@ class UserController(private val userService: UserService) {
     return ResponseEntity.ok(userService.convertUserToResponse(user).libraries)
   }
 
-  @CrossOrigin(origins = ["http://localhost:3000"])
   @PostMapping("/{userId}/libraries")
   fun createUserLibrary(
     @PathVariable("userId") userId: String,
@@ -91,7 +82,6 @@ class UserController(private val userService: UserService) {
     return ResponseEntity.ok(userResponse)
   }
 
-  @CrossOrigin(origins = ["http://localhost:3000"])
   @PatchMapping("/{userId}/libraries/{libraryId}")
   fun deleteUserLibrary(
     @PathVariable("userId") userId: String,

@@ -15,7 +15,6 @@ import java.util.*
 @RequestMapping("/libraries")
 class LibraryController(private val libraryService: LibraryService) {
 
-  @CrossOrigin(origins = ["http://localhost:3000", "http://localhost:3000/libraries"])
   @GetMapping("/{id}")
   fun getSingleLibrary(
     @PathVariable("id") id: String
@@ -24,7 +23,6 @@ class LibraryController(private val libraryService: LibraryService) {
     return ResponseEntity.ok(library)
   }
 
-  @CrossOrigin(origins = ["http://localhost:3000", "http://localhost:3000/libraries"])
   @GetMapping("/{id}/withGames")
   fun getSingleLibraryWithGames(
     @PathVariable("id") id: String
@@ -34,7 +32,6 @@ class LibraryController(private val libraryService: LibraryService) {
     return ResponseEntity.ok(libraryResponse)
   }
 
-  @CrossOrigin(origins = ["http://localhost:3000", "http://localhost:3000/libraries"])
   @PostMapping("/")
   fun createLibrary(
     @RequestBody libraryRequest: LibraryRequest
@@ -43,7 +40,6 @@ class LibraryController(private val libraryService: LibraryService) {
     return ResponseEntity<Library>(library, HttpStatus.CREATED)
   }
 
-  @CrossOrigin(origins = ["http://localhost:3000", "http://localhost:3000/libraries"])
   @PostMapping("/{libraryId}/games")
   fun addToLibrary(
     @PathVariable("libraryId") libraryId: String,
