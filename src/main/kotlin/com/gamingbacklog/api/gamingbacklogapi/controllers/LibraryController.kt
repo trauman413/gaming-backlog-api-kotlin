@@ -15,14 +15,12 @@ import java.util.*
 @RequestMapping("/libraries")
 class LibraryController(private val libraryService: LibraryService) {
 
-  @CrossOrigin(origins = ["http://localhost:3000", "http://localhost:3000/libraries"])
   @GetMapping("/withGames")
   fun getAllLibraries(): ResponseEntity<List<Library>> {
     val libraries = libraryService.getAll()
     return ResponseEntity.ok(libraries)
   }
 
-  @CrossOrigin(origins = ["http://localhost:3000", "http://localhost:3000/libraries"])
   @GetMapping("/{id}")
   fun getSingleLibrary(
     @PathVariable("id") id: String
