@@ -2,11 +2,13 @@ package com.gamingbacklog.api.gamingbacklogapi.services
 
 import com.gamingbacklog.api.gamingbacklogapi.models.GameInstance
 import com.gamingbacklog.api.gamingbacklogapi.models.Library
+import com.gamingbacklog.api.gamingbacklogapi.models.enums.LibraryStatus
 import com.gamingbacklog.api.gamingbacklogapi.repositories.LibraryRepository
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.LibraryRequest
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.Request
 import com.gamingbacklog.api.gamingbacklogapi.models.responses.GameResponse
 import com.gamingbacklog.api.gamingbacklogapi.models.responses.LibraryResponse
+import com.gamingbacklog.api.gamingbacklogapi.models.results.LibraryResult
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import java.util.ArrayList
@@ -51,22 +53,33 @@ class LibraryService (
     libraryRepository.save(model)
   }
 
-  fun addToLibrary(libraryId: String, gameId: String): Library? {
+  fun addToLibrary(libraryId: String, gameId: String): LibraryResult {
+    if (!isValidGameInstanceId(gameId)) {
+      return LibraryResult(null, LibraryStatus.GAME_DOES_NOT_EXIST)
+    }
     val library = getSingle(libraryId)
     if (library != null) {
+      if (library.games.contains(gameId)) {
+        return LibraryResult(library, LibraryStatus.GAME_DUPLICATE_FOUND)
+      }
       library.games.add(gameId)
       update(library)
+      return LibraryResult(library, LibraryStatus.SUCCESS)
     }
-    return library
+    return LibraryResult(null, LibraryStatus.LIBRARY_DOES_NOT_EXIST)
   }
 
-  fun deleteGameFromLibrary(libraryId: String, gameId: String): Library? {
+  fun deleteGameFromLibrary(libraryId: String, gameId: String): LibraryResult {
+    if (!isValidGameInstanceId(gameId)) {
+      return LibraryResult(null, LibraryStatus.GAME_DOES_NOT_EXIST)
+    }
     val library = getSingle(libraryId)
     if (library != null) {
       library.games.remove(gameId)
       update(library)
+      return LibraryResult(library, LibraryStatus.SUCCESS)
     }
-    return library
+    return LibraryResult(null, LibraryStatus.LIBRARY_DOES_NOT_EXIST)
   }
 
   // TODO: error handling here
@@ -91,6 +104,10 @@ class LibraryService (
     } else {
       LibraryResponse(id = library.id, name = library.name, games = emptyList());
     }
+  }
+
+  fun isValidGameInstanceId(gameId: String): Boolean {
+    return gameInstanceService.getSingle(gameId) != null
   }
 
 }
