@@ -73,7 +73,6 @@ class GameInstanceServiceTests {
   @DisplayName("Update With Custom Fields Tests")
   inner class UpdateWithCustomFields {
 
-    // update some fields
   @Test
   fun shouldUpdateSomeFields() {
       val gameInstanceRequest = GameInstanceRequest(
