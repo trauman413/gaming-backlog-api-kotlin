@@ -121,7 +121,7 @@ class LibraryServiceTests {
       // run duplicate
       val result = libraryService.addToLibrary(libraryId, gameId1)
       assertEquals(mockLibraryDb[libraryId], result.library)
-      assertEquals(LibraryStatus.DUPLICATE_NOT_ADDED, result.libraryStatus)
+      assertEquals(LibraryStatus.GAME_DUPLICATE_FOUND, result.libraryStatus)
     }
 
     @Test

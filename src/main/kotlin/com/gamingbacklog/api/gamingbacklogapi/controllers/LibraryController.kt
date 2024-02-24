@@ -50,7 +50,7 @@ class LibraryController(private val libraryService: LibraryService) {
     return when (libraryResult.libraryStatus) {
       LibraryStatus.SUCCESS -> ResponseEntity.ok(libraryResult.library?.let { libraryService.convertLibraryToResponse(it) })
       LibraryStatus.LIBRARY_DOES_NOT_EXIST, LibraryStatus.GAME_DOES_NOT_EXIST -> ResponseEntity<LibraryResponse>(HttpStatus.NOT_FOUND)
-      LibraryStatus.DUPLICATE_NOT_ADDED -> ResponseEntity<LibraryResponse>(HttpStatus.BAD_REQUEST)
+      LibraryStatus.GAME_DUPLICATE_FOUND -> ResponseEntity<LibraryResponse>(HttpStatus.BAD_REQUEST)
     }
   }
 

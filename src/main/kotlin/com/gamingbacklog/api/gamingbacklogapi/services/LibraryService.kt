@@ -60,7 +60,7 @@ class LibraryService (
     val library = getSingle(libraryId)
     if (library != null) {
       if (library.games.contains(gameId)) {
-        return LibraryResult(library, LibraryStatus.DUPLICATE_NOT_ADDED)
+        return LibraryResult(library, LibraryStatus.GAME_DUPLICATE_FOUND)
       }
       library.games.add(gameId)
       update(library)
