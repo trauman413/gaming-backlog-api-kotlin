@@ -49,7 +49,7 @@ class LibraryController(private val libraryService: LibraryService) {
     val libraryResult = libraryService.addToLibrary(libraryId, addGameToLibrary.gameId)
     return when (libraryResult.libraryStatus) {
       LibraryStatus.SUCCESS -> ResponseEntity.ok(libraryResult.library?.let { libraryService.convertLibraryToResponse(it) })
-      LibraryStatus.LIBRARY_DOES_NOT_EXIST -> ResponseEntity<LibraryResponse>(HttpStatus.NOT_FOUND)
+      LibraryStatus.LIBRARY_DOES_NOT_EXIST, LibraryStatus.GAME_DOES_NOT_EXIST -> ResponseEntity<LibraryResponse>(HttpStatus.NOT_FOUND)
       LibraryStatus.DUPLICATE_NOT_ADDED -> ResponseEntity<LibraryResponse>(HttpStatus.BAD_REQUEST)
     }
   }
@@ -69,9 +69,12 @@ class LibraryController(private val libraryService: LibraryService) {
     @PathVariable("id") libraryId: String,
     @RequestBody removeGameFromLibrary: UpdateLibraryGamesRequest
   ): ResponseEntity<LibraryResponse> {
-    val library = libraryService.deleteGameFromLibrary(libraryId, removeGameFromLibrary.gameId)
-      ?: return ResponseEntity<LibraryResponse>(HttpStatus.NOT_FOUND)
-    return ResponseEntity.ok(libraryService.convertLibraryToResponse(library))
+    val libraryResult = libraryService.deleteGameFromLibrary(libraryId, removeGameFromLibrary.gameId)
+    return when (libraryResult.libraryStatus) {
+      LibraryStatus.SUCCESS -> ResponseEntity.ok(libraryResult.library?.let { libraryService.convertLibraryToResponse(it) })
+      LibraryStatus.LIBRARY_DOES_NOT_EXIST, LibraryStatus.GAME_DOES_NOT_EXIST -> ResponseEntity<LibraryResponse>(HttpStatus.NOT_FOUND)
+      else -> ResponseEntity<LibraryResponse>(HttpStatus.INTERNAL_SERVER_ERROR) // should never reach this branch
+    }
   }
 
   @DeleteMapping("/{id}")

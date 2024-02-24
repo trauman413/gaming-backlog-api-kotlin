@@ -1,6 +1,8 @@
 package com.gamingbacklog.api.gamingbacklogapi.unit.services
 
+import com.gamingbacklog.api.gamingbacklogapi.models.GameInstance
 import com.gamingbacklog.api.gamingbacklogapi.models.Library
+import com.gamingbacklog.api.gamingbacklogapi.models.enums.LibraryStatus
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.LibraryRequest
 import com.gamingbacklog.api.gamingbacklogapi.repositories.LibraryRepository
 import com.gamingbacklog.api.gamingbacklogapi.services.GameInstanceService
@@ -9,6 +11,7 @@ import com.gamingbacklog.api.gamingbacklogapi.services.LibraryService
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -30,6 +33,18 @@ class LibraryServiceTests {
 
   private val libraryId = "70b664a416135a6e967fadc6"
   private val gameId1 = "81c775b527246b7f078gbde7"
+
+  private val testGameInstance = GameInstance(
+    id = gameId1,
+    igdbId = "",
+    name = "",
+    companies = listOf(),
+    platforms = listOf(),
+    genres = listOf(),
+    releaseDate = listOf(),
+    summary = "",
+    images = listOf()
+  )
 
 
   fun mockSave(library: Library) {
@@ -84,15 +99,37 @@ class LibraryServiceTests {
     @Test
     fun shouldAddToLibrary() {
       saveMockLibraryDB(libraryId, "Backlog", arrayListOf())
-      mockLibraryDb[libraryId]?.games?.add(gameId1)
+      given(gameInstanceService.getSingle(gameId1)).willReturn(testGameInstance)
       val result = libraryService.addToLibrary(libraryId, gameId1)
-      assertEquals(mockLibraryDb[libraryId], result)
+      assertEquals(mockLibraryDb[libraryId], result.library)
+      assertEquals(LibraryStatus.SUCCESS, result.libraryStatus)
     }
 
     @Test
-    fun shouldNotAddToLibraryIfNoIDFound() {
+    fun shouldNotAddToLibraryIfNoLibraryIDFound() {
+      given(gameInstanceService.getSingle(gameId1)).willReturn(testGameInstance)
       val result = libraryService.addToLibrary(libraryId, gameId1)
-      assertEquals(null, result)
+      assertNull(result.library)
+      assertEquals(LibraryStatus.LIBRARY_DOES_NOT_EXIST, result.libraryStatus)
+    }
+
+    @Test
+    fun shouldNotAddDuplicateID() {
+      given(gameInstanceService.getSingle(gameId1)).willReturn(testGameInstance)
+      saveMockLibraryDB(libraryId, "Backlog", arrayListOf())
+      libraryService.addToLibrary(libraryId, gameId1)
+      // run duplicate
+      val result = libraryService.addToLibrary(libraryId, gameId1)
+      assertEquals(mockLibraryDb[libraryId], result.library)
+      assertEquals(LibraryStatus.DUPLICATE_NOT_ADDED, result.libraryStatus)
+    }
+
+    @Test
+    fun shouldHaveGameDoesNotExistError() {
+      given(gameInstanceService.getSingle(gameId1)).willReturn(null)
+      val result = libraryService.addToLibrary(libraryId, gameId1)
+      assertNull(result.library)
+      assertEquals(LibraryStatus.GAME_DOES_NOT_EXIST, result.libraryStatus)
     }
   }
 
@@ -101,16 +138,27 @@ class LibraryServiceTests {
   inner class DeleteGameFromLibrary {
     @Test
     fun shouldDeleteGameFromLibrary() {
+      given(gameInstanceService.getSingle(gameId1)).willReturn(testGameInstance)
       saveMockLibraryDB(libraryId, "Backlog", arrayListOf(gameId1))
-      mockLibraryDb[libraryId]?.games?.remove(gameId1)
       val result = libraryService.deleteGameFromLibrary(libraryId, gameId1)
-      assertEquals(mockLibraryDb[libraryId], result)
+      assertEquals(mockLibraryDb[libraryId], result.library)
+      assertEquals(LibraryStatus.SUCCESS, result.libraryStatus)
     }
 
     @Test
-    fun shouldNotDeleteIfNoIDIsFound() {
+    fun shouldNotDeleteIfNoLibraryIDIsFound() {
+      given(gameInstanceService.getSingle(gameId1)).willReturn(testGameInstance)
       val result = libraryService.deleteGameFromLibrary(libraryId, gameId1)
-      assertEquals(null, result)
+      assertNull(result.library)
+      assertEquals(LibraryStatus.LIBRARY_DOES_NOT_EXIST, result.libraryStatus)
+    }
+
+    @Test
+    fun shouldNotDeleteIfNoGameIDIsFound() {
+      given(gameInstanceService.getSingle(gameId1)).willReturn(null)
+      val result = libraryService.deleteGameFromLibrary(libraryId, gameId1)
+      assertNull(result.library)
+      assertEquals(LibraryStatus.GAME_DOES_NOT_EXIST, result.libraryStatus)
     }
   }
 }

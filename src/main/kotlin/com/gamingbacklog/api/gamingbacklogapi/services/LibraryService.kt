@@ -54,6 +54,9 @@ class LibraryService (
   }
 
   fun addToLibrary(libraryId: String, gameId: String): LibraryResult {
+    if (!isValidGameInstanceId(gameId)) {
+      return LibraryResult(null, LibraryStatus.GAME_DOES_NOT_EXIST)
+    }
     val library = getSingle(libraryId)
     if (library != null) {
       if (library.games.contains(gameId)) {
@@ -66,13 +69,17 @@ class LibraryService (
     return LibraryResult(null, LibraryStatus.LIBRARY_DOES_NOT_EXIST)
   }
 
-  fun deleteGameFromLibrary(libraryId: String, gameId: String): Library? {
+  fun deleteGameFromLibrary(libraryId: String, gameId: String): LibraryResult {
+    if (!isValidGameInstanceId(gameId)) {
+      return LibraryResult(null, LibraryStatus.GAME_DOES_NOT_EXIST)
+    }
     val library = getSingle(libraryId)
     if (library != null) {
       library.games.remove(gameId)
       update(library)
+      return LibraryResult(library, LibraryStatus.SUCCESS)
     }
-    return library
+    return LibraryResult(null, LibraryStatus.LIBRARY_DOES_NOT_EXIST)
   }
 
   // TODO: error handling here
@@ -97,6 +104,10 @@ class LibraryService (
     } else {
       LibraryResponse(id = library.id, name = library.name, games = emptyList());
     }
+  }
+
+  fun isValidGameInstanceId(gameId: String): Boolean {
+    return gameInstanceService.getSingle(gameId) != null
   }
 
 }

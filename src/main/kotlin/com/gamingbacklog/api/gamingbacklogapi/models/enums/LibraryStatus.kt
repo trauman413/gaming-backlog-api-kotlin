@@ -3,5 +3,6 @@ package com.gamingbacklog.api.gamingbacklogapi.models.enums
 enum class LibraryStatus {
   SUCCESS,
   DUPLICATE_NOT_ADDED,
-  LIBRARY_DOES_NOT_EXIST
+  LIBRARY_DOES_NOT_EXIST,
+  GAME_DOES_NOT_EXIST
 }
