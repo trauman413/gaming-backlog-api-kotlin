@@ -15,6 +15,12 @@ import java.util.*
 @RequestMapping("/libraries")
 class LibraryController(private val libraryService: LibraryService) {
 
+  @GetMapping("/withGames")
+  fun getAllLibraries(): ResponseEntity<List<Library>> {
+    val libraries = libraryService.getAll()
+    return ResponseEntity.ok(libraries)
+  }
+
   @GetMapping("/{id}")
   fun getSingleLibrary(
     @PathVariable("id") id: String
