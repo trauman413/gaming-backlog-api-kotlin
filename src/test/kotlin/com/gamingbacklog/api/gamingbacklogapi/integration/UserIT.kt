@@ -2,9 +2,9 @@ package com.gamingbacklog.api.gamingbacklogapi.integration
 
 import com.gamingbacklog.api.gamingbacklogapi.clients.IGDBClient
 import com.gamingbacklog.api.gamingbacklogapi.controllers.UserController
+import com.gamingbacklog.api.gamingbacklogapi.integration.constants.GameInstanceSamples.game6
 import com.gamingbacklog.api.gamingbacklogapi.integration.utils.RequestBuilder
 import com.gamingbacklog.api.gamingbacklogapi.integration.utils.TestUtils.requestToString
-import com.gamingbacklog.api.gamingbacklogapi.models.GameInstance
 import com.gamingbacklog.api.gamingbacklogapi.models.Library
 import com.gamingbacklog.api.gamingbacklogapi.models.User
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.UserRequest
@@ -51,7 +51,6 @@ class UserIT {
   var id1 = "70b664a416135a6e967fadc6"
   val id2 = "dd7f03b962f1f3416d08ee0f"
   val id3 = "5e11b8c6fbb706c75e058337"
-  val id4 = "8e9f5b65026d638f7cd75166"
 
   @BeforeEach
   fun configureSystem() {
@@ -225,14 +224,12 @@ class UserIT {
     @Test
     fun shouldReturnAllLibraries() {
       val user = User("id1", "displayName", "so secure", "test@test.com")
-      val library1 = LibraryResponse(id2, "Backlog", listOf(GameResponse(id3, "Sea of Stars")))
-      val game = GameInstance(id3, "", "Sea of Stars", listOf(),
-        listOf(), listOf(), listOf(), listOf(), listOf(), "")
+      val library1 = LibraryResponse(id2, "Backlog", listOf(GameResponse(id1, "Final Fantasy X")))
       user.libraries.add(library1.id)
       given(userRepository.findOneById(any())).willReturn(user)
-      given(libraryRepository.findOneById(any())).willReturn(Library(id2, "Backlog", arrayListOf(id3)))
-      given(gameInstanceRepository.findOneById(any())).willReturn(game)
-      given(gameInstanceRepository.findByName(any())).willReturn(game)
+      given(libraryRepository.findOneById(any())).willReturn(Library(id2, "Backlog", arrayListOf(id1)))
+      given(gameInstanceRepository.findOneById(any())).willReturn(game6)
+      given(gameInstanceRepository.findByName(any())).willReturn(game6)
       requestBuilder.runGetRequest("$endpoint/$id1/libraries")
         .andExpect(status().isOk)
         .andExpect(jsonPath("$[0].id", equalTo(library1.id)))

@@ -2,9 +2,13 @@ package com.gamingbacklog.api.gamingbacklogapi.integration
 
 import com.gamingbacklog.api.gamingbacklogapi.clients.IGDBClient
 import com.gamingbacklog.api.gamingbacklogapi.controllers.LibraryController
+import com.gamingbacklog.api.gamingbacklogapi.integration.constants.GameInstanceSamples.game10
+import com.gamingbacklog.api.gamingbacklogapi.integration.constants.GameInstanceSamples.game5
+import com.gamingbacklog.api.gamingbacklogapi.integration.constants.GameInstanceSamples.game7
+import com.gamingbacklog.api.gamingbacklogapi.integration.constants.GameInstanceSamples.game8
+import com.gamingbacklog.api.gamingbacklogapi.integration.constants.GameInstanceSamples.game9
 import com.gamingbacklog.api.gamingbacklogapi.integration.utils.RequestBuilder
 import com.gamingbacklog.api.gamingbacklogapi.integration.utils.TestUtils.requestToString
-import com.gamingbacklog.api.gamingbacklogapi.models.GameInstance
 import com.gamingbacklog.api.gamingbacklogapi.models.Library
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.LibraryRequest
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.UpdateLibraryGamesRequest
@@ -115,30 +119,19 @@ class LibraryIT {
   @Nested
   @DisplayName("Tests for addToLibrary")
   inner class AddToLibrary {
-    private val gameInstance = GameInstance(
-      id = id1,
-      igdbId = "",
-      name = "Nier: Automata",
-      platforms = listOf(),
-      companies = listOf(),
-      genres = listOf(),
-      images = listOf(),
-      summary = "",
-      releaseDate = listOf()
-    )
 
     @Test
     fun shouldSuccessfullyAddToLibrary() {
       val library = Library(id2, "Backlog", ArrayList())
-      given(gameInstanceRepository.findOneById(any())).willReturn(gameInstance)
-      given(gameInstanceRepository.findByName(any())).willReturn(gameInstance)
+      given(gameInstanceRepository.findOneById(any())).willReturn(game5)
+      given(gameInstanceRepository.findByName(any())).willReturn(game5)
       given(libraryRepository.findOneById(any())).willReturn(library)
       val request = UpdateLibraryGamesRequest(id1)
       requestBuilder.runPostRequest("$endpoint$id2/games", Gson().toJson(request))
         .andExpect(status().isOk)
         .andExpect(jsonPath("$.name", equalTo(library.name)))
         .andExpect(jsonPath("$.games[0].id", equalTo(id1)))
-        .andExpect(jsonPath("$.games[0].name", equalTo("Nier: Automata")))
+        .andExpect(jsonPath("$.games[0].name", equalTo("Trails in the Sky")))
     }
   }
 
@@ -167,15 +160,13 @@ class LibraryIT {
     fun shouldGetGameFromLibrarySuccessfully() {
       val library = Library("id1", "Backlog", ArrayList())
       library.games.add(id2)
-      val game = GameInstance(id2, "19", "Fire Emblem: Engage",
-        arrayListOf("Nintendo Switch"), arrayListOf("RPG"), arrayListOf("Fire Emblem"), arrayListOf("Nintendo", "Intelligent Systems"),
-        arrayListOf("January 20 2023"), arrayListOf(""), "Shine on, Emblem of Beginnings!")
       given(libraryRepository.findOneById(any())).willReturn(library)
-      given(gameInstanceRepository.findOneById(any())).willReturn(game)
-      given(gameInstanceRepository.findByName(any())).willReturn(game)
+      given(gameInstanceRepository.findOneById(any())).willReturn(game7)
+      given(gameInstanceRepository.findByName(any())).willReturn(game7)
       endpoint += "$id1/games/$id2"
       requestBuilder.runGetRequest(endpoint)
         .andExpect(status().isOk)
+        .andExpect(jsonPath("$.id", equalTo(id2)))
         .andExpect(jsonPath("$.name", equalTo("Fire Emblem: Engage")))
         .andExpect(jsonPath("$.igdbId", equalTo("19")))
         .andExpect(jsonPath("$.platforms[0]", equalTo("Nintendo Switch")))
@@ -205,46 +196,13 @@ class LibraryIT {
     @Test
     fun shouldSuccessfullyDeleteGameFromLibrary() {
       val library = Library(id1, "Backlog", arrayListOf(id2, id3, id4))
-      val game1 = GameInstance(
-        id = id2,
-        igdbId = "",
-        name = "Super Mario 64",
-        platforms = listOf(),
-        companies = listOf(),
-        genres = listOf(),
-        images = listOf(),
-        summary = "",
-        releaseDate = listOf()
-      )
-      val game2 = GameInstance(
-        id = id3,
-        igdbId = "",
-        name = "Super Mario Sunshine",
-        platforms = listOf(),
-        companies = listOf(),
-        genres = listOf(),
-        images = listOf(),
-        summary = "",
-        releaseDate = listOf()
-      )
-      val game3 = GameInstance(
-        id = id4,
-        igdbId = "",
-        name = "Super Mario Galaxy",
-        platforms = listOf(),
-        companies = listOf(),
-        genres = listOf(),
-        images = listOf(),
-        summary = "",
-        releaseDate = listOf()
-      )
       given(libraryRepository.findOneById(any())).willReturn(library)
-      given(gameInstanceRepository.findOneById(ObjectId(id2))).willReturn(game1)
-      given(gameInstanceRepository.findOneById(ObjectId(id3))).willReturn(game2)
-      given(gameInstanceRepository.findOneById(ObjectId(id4))).willReturn(game3)
-      given(gameInstanceRepository.findByName("Super Mario 64")).willReturn(game1)
-      given(gameInstanceRepository.findByName("Super Mario Sunshine")).willReturn(game2)
-      given(gameInstanceRepository.findByName("Super Mario Galaxy")).willReturn(game3)
+      given(gameInstanceRepository.findOneById(ObjectId(id2))).willReturn(game8)
+      given(gameInstanceRepository.findOneById(ObjectId(id3))).willReturn(game9)
+      given(gameInstanceRepository.findOneById(ObjectId(id4))).willReturn(game10)
+      given(gameInstanceRepository.findByName("Super Mario 64")).willReturn(game8)
+      given(gameInstanceRepository.findByName("Super Mario Sunshine")).willReturn(game9)
+      given(gameInstanceRepository.findByName("Super Mario Galaxy")).willReturn(game10)
 
       val request = UpdateLibraryGamesRequest(id3)
       requestBuilder.runDeleteRequest("$endpoint$id1/games", Gson().toJson(request))

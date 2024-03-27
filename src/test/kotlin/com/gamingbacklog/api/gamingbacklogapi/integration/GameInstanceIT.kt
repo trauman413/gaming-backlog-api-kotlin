@@ -2,6 +2,12 @@ package com.gamingbacklog.api.gamingbacklogapi.integration
 
 import com.gamingbacklog.api.gamingbacklogapi.clients.IGDBClient
 import com.gamingbacklog.api.gamingbacklogapi.controllers.GameInstanceController
+import com.gamingbacklog.api.gamingbacklogapi.integration.constants.GameInstanceSamples.game1
+import com.gamingbacklog.api.gamingbacklogapi.integration.constants.GameInstanceSamples.game2
+import com.gamingbacklog.api.gamingbacklogapi.integration.constants.GameInstanceSamples.game3
+import com.gamingbacklog.api.gamingbacklogapi.integration.constants.GameInstanceSamples.game4
+import com.gamingbacklog.api.gamingbacklogapi.integration.constants.GameInstanceSamples.game5
+import com.gamingbacklog.api.gamingbacklogapi.integration.constants.GameInstanceSamples.game6
 import com.gamingbacklog.api.gamingbacklogapi.models.Game
 import com.gamingbacklog.api.gamingbacklogapi.models.GameInstance
 import com.gamingbacklog.api.gamingbacklogapi.repositories.GameInstanceRepository
@@ -12,8 +18,12 @@ import com.gamingbacklog.api.gamingbacklogapi.services.GameService
 import com.gamingbacklog.api.gamingbacklogapi.integration.utils.RequestBuilder
 import com.gamingbacklog.api.gamingbacklogapi.integration.utils.TestUtils.requestToString
 import org.hamcrest.CoreMatchers
-import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
@@ -35,8 +45,7 @@ class GameInstanceIT {
   val gameInstanceService = GameInstanceService(gameInstanceRepository, GameService(gameRepository, igdbClient))
   lateinit var requestBuilder: RequestBuilder
   private var endpoint = "/gameinstances/"
-  val id1 = "70b664a416135a6e967fadc6"
-  val id2 = "dd7f03b962f1f3416d08ee0f"
+  final val id1 = "70b664a416135a6e967fadc6"
 
   @BeforeEach
   fun configureSystem() {
@@ -51,30 +60,6 @@ class GameInstanceIT {
   inner class GetGameInstances {
     @Test
     fun shouldSuccessfullyGetAllGameInstances() {
-      val game1 = GameInstance(
-        "id1",
-        "igdb1",
-        "Persona 5 Royal",
-        arrayListOf("PS4"),
-        arrayListOf("RPG"),
-        arrayListOf("Persona"),
-        arrayListOf("Atlus"),
-        arrayListOf("2020"),
-        arrayListOf(""),
-        "Steal their heart!"
-      )
-      val game2 = GameInstance(
-        "id2",
-        "igdb2",
-        "Persona 4 Golden",
-        arrayListOf("PSVita"),
-        arrayListOf("RPG"),
-        arrayListOf("Persona"),
-        arrayListOf("Atlus"),
-        arrayListOf("2012"),
-        arrayListOf(""),
-        "Everyday is great at your Junes!"
-      )
       val games = ArrayList<GameInstance>()
       games.add(game1)
       games.add(game2)
@@ -105,12 +90,7 @@ class GameInstanceIT {
   inner class GetSingleGameInstance {
     @Test
     fun shouldSuccessfullyReturnGame() {
-      val game = GameInstance(
-        id1, "igdb1", "Live a Live",
-        arrayListOf("Nintendo Switch"), arrayListOf("RPG"), arrayListOf("Live a Live"), arrayListOf("Square Enix"),
-        arrayListOf("2022"), arrayListOf("url"), "so many stories"
-      )
-      given(gameInstanceRepository.findOneById(any())).willReturn(game)
+      given(gameInstanceRepository.findOneById(any())).willReturn(game3)
       endpoint += "$id1/"
       requestBuilder.runGetRequest(endpoint)
         .andExpect(MockMvcResultMatchers.status().isOk)
@@ -141,28 +121,17 @@ class GameInstanceIT {
   inner class CreateGameInstance {
     @Test
     fun shouldSuccessfullyCreateGame() {
-      val newGame = GameInstance(
-        id = id1,
-        igdbId = "igdb1",
-        name = "Celeste",
-        platforms = arrayListOf("Nintendo Switch", "PC", "PS4", "Xbox One"),
-        genres = arrayListOf("Platformer"),
-        companies = arrayListOf("Extremely OK Games"),
-        releaseDate = arrayListOf("2018"),
-        images = arrayListOf("so mountain"),
-        summary = "Climb up the mountain in this hard platformer"
-      )
       given(gameRepository.findByigdbId(any())).willReturn(
         Game(
           id = "",
           igdbId = "igdb1",
-          name = newGame.name,
-          platforms = newGame.platforms,
-          genres = newGame.genres,
-          companies = newGame.companies,
-          releaseDate = newGame.releaseDate,
-          images = newGame.images,
-          summary = newGame.summary
+          name = game4.name,
+          platforms = game4.platforms,
+          genres = game4.genres,
+          companies = game4.companies,
+          releaseDate = game4.releaseDate,
+          images = game4.images,
+          summary = game4.summary
         )
       )
       val gameInstanceRequest = GameInstanceRequest(
@@ -171,34 +140,24 @@ class GameInstanceIT {
       )
       requestBuilder.runPostRequest(endpoint, requestToString(gameInstanceRequest))
         .andExpect(MockMvcResultMatchers.status().isCreated)
-        .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.equalTo(newGame.name)))
-        .andExpect(MockMvcResultMatchers.jsonPath("$.igdbId", CoreMatchers.equalTo(newGame.igdbId)))
-        .andExpect(MockMvcResultMatchers.jsonPath("$.platforms[0]", CoreMatchers.equalTo(newGame.platforms[0])))
-        .andExpect(MockMvcResultMatchers.jsonPath("$.platforms[1]", CoreMatchers.equalTo(newGame.platforms[1])))
-        .andExpect(MockMvcResultMatchers.jsonPath("$.platforms[2]", CoreMatchers.equalTo(newGame.platforms[2])))
-        .andExpect(MockMvcResultMatchers.jsonPath("$.platforms[3]", CoreMatchers.equalTo(newGame.platforms[3])))
-        .andExpect(MockMvcResultMatchers.jsonPath("$.genres[0]", CoreMatchers.equalTo(newGame.genres[0])))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.equalTo(game4.name)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.igdbId", CoreMatchers.equalTo(game4.igdbId)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.platforms[0]", CoreMatchers.equalTo(game4.platforms[0])))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.platforms[1]", CoreMatchers.equalTo(game4.platforms[1])))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.platforms[2]", CoreMatchers.equalTo(game4.platforms[2])))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.platforms[3]", CoreMatchers.equalTo(game4.platforms[3])))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.genres[0]", CoreMatchers.equalTo(game4.genres[0])))
         .andExpect(MockMvcResultMatchers.jsonPath("$.universes", CoreMatchers.equalTo(null)))
-        .andExpect(MockMvcResultMatchers.jsonPath("$.companies[0]", CoreMatchers.equalTo(newGame.companies[0])))
-        .andExpect(MockMvcResultMatchers.jsonPath("$.releaseDate[0]", CoreMatchers.equalTo(newGame.releaseDate[0])))
-        .andExpect(MockMvcResultMatchers.jsonPath("$.images[0]", CoreMatchers.equalTo(newGame.images[0])))
-        .andExpect(MockMvcResultMatchers.jsonPath("$.summary", CoreMatchers.equalTo(newGame.summary)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.companies[0]", CoreMatchers.equalTo(game4.companies[0])))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.releaseDate[0]", CoreMatchers.equalTo(game4.releaseDate[0])))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.images[0]", CoreMatchers.equalTo(game4.images[0])))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.summary", CoreMatchers.equalTo(game4.summary)))
     }
   }
 
   @Nested
   @DisplayName("Tests for updateGameInstance")
   inner class UpdateGameInstance {
-    private fun setValues(gameInstanceRequest: GameInstanceRequest, game: GameInstance) {
-      if (gameInstanceRequest.rating != null) game.rating = gameInstanceRequest.rating
-      if (gameInstanceRequest.review != null) game.review = gameInstanceRequest.review
-      if (gameInstanceRequest.ranking != null) game.ranking = gameInstanceRequest.ranking
-      if (gameInstanceRequest.yearPlayed != null) game.yearPlayed = gameInstanceRequest.yearPlayed
-      if (gameInstanceRequest.yearReceived != null) game.yearReceived = gameInstanceRequest.yearReceived
-      if (gameInstanceRequest.notes != null) game.notes = gameInstanceRequest.notes
-      if (gameInstanceRequest.platformsOwnedOn != null) game.platformsOwnedOn = gameInstanceRequest.platformsOwnedOn
-    }
-
     @Test
     fun successfullyUpdateAllFields() {
       val gameInstanceRequest = GameInstanceRequest(
@@ -211,23 +170,18 @@ class GameInstanceIT {
         "Own on GOG from sale",
         arrayListOf("PC")
       )
-      val game = GameInstance(
-        id1, "igdb1", "Trails in the Sky",
-        arrayListOf("PC", "PSP"),
-        arrayListOf("RPG"), arrayListOf("Trails", "Legend of Heroes"), arrayListOf("Falcom"),
-        arrayListOf("2004"), arrayListOf("sky"), "wholesome"
-      )
+
       endpoint += "$id1/"
-      given(gameInstanceRepository.findOneById(any())).willReturn(game)
+      given(gameInstanceRepository.findOneById(any())).willReturn(game5)
       requestBuilder.runPatchRequest(endpoint, requestToString(gameInstanceRequest))
         .andExpect(MockMvcResultMatchers.status().isOk)
-      assertEquals(game.rating, gameInstanceRequest.rating)
-      assertEquals(game.review, gameInstanceRequest.review)
-      assertEquals(game.ranking, gameInstanceRequest.ranking)
-      assertEquals(game.yearPlayed, gameInstanceRequest.yearPlayed)
-      assertEquals(game.yearReceived, gameInstanceRequest.yearReceived)
-      assertEquals(game.notes, gameInstanceRequest.notes)
-      assertEquals(game.platformsOwnedOn, gameInstanceRequest.platformsOwnedOn)
+      assertEquals(game5.rating, gameInstanceRequest.rating)
+      assertEquals(game5.review, gameInstanceRequest.review)
+      assertEquals(game5.ranking, gameInstanceRequest.ranking)
+      assertEquals(game5.yearPlayed, gameInstanceRequest.yearPlayed)
+      assertEquals(game5.yearReceived, gameInstanceRequest.yearReceived)
+      assertEquals(game5.notes, gameInstanceRequest.notes)
+      assertEquals(game5.platformsOwnedOn, gameInstanceRequest.platformsOwnedOn)
     }
 
     @Test
@@ -242,22 +196,18 @@ class GameInstanceIT {
         "why do i own this game on 4 platforms? this is factual not just making stuff up for test cases",
         arrayListOf("PC", "Switch", "PS3", "PS2")
       )
-      val game = GameInstance(id1, "igdb1", "Final Fantasy X",
-        arrayListOf("a lot"),
-        arrayListOf("RPG"), arrayListOf("Final Fantasy"), arrayListOf("Square Enix"),
-        arrayListOf("2001"), arrayListOf("zanarkand"), "this game will make you cry")
 
-      given(gameInstanceRepository.findOneById(any())).willReturn(game)
+      given(gameInstanceRepository.findOneById(any())).willReturn(game6)
       endpoint += "$id1/"
       requestBuilder.runPatchRequest(endpoint, requestToString(gameInstanceRequest))
         .andExpect(MockMvcResultMatchers.status().isOk)
-      assertEquals(game.rating, gameInstanceRequest.rating)
-      assertEquals(game.review, gameInstanceRequest.review)
-      assertEquals(game.ranking, gameInstanceRequest.ranking)
-      assertEquals(game.yearPlayed, gameInstanceRequest.yearPlayed)
-      assertEquals(game.yearReceived, gameInstanceRequest.yearReceived)
-      assertEquals(game.notes, gameInstanceRequest.notes)
-      assertEquals(game.platformsOwnedOn, gameInstanceRequest.platformsOwnedOn)
+      assertEquals(gameInstanceRequest.rating, game6.rating)
+      assertEquals("i <3 this game", game6.review)
+      assertEquals("1", game6.ranking)
+      assertEquals(2006, game6.yearPlayed)
+      assertEquals(2004, game6.yearReceived)
+      assertEquals(gameInstanceRequest.notes, game6.notes)
+      assertEquals(gameInstanceRequest.platformsOwnedOn, game6.platformsOwnedOn)
     }
   }
 
@@ -266,19 +216,15 @@ class GameInstanceIT {
   inner class DeleteGameInstances {
     @Test
     fun shouldSuccessfullyDeleteGameInstance() {
-      val newGame = GameInstance(id1, "igdb1", "Paper Mario: The Thousand Year Door",
-        arrayListOf("GameCube"),
-        arrayListOf("RPG"), arrayListOf("Paper Mario"), arrayListOf("Nintendo", "Intelligent Systems"),
-        arrayListOf("2004"), arrayListOf("url"), "Fun turn-based fun")
       val games = ArrayList<GameInstance>()
-      games.add(newGame)
+      games.add(game6)
       given(gameInstanceRepository.deleteById(any())).willAnswer {
-        games.remove(newGame)
+        games.remove(game6)
       }
       requestBuilder.runDeleteRequest("$endpoint/$id1")
         .andExpect(MockMvcResultMatchers.status().isOk)
         .andExpect(MockMvcResultMatchers.content().string(CoreMatchers.containsString("Successfully deleted game instance")))
-      Assertions.assertTrue(games.isEmpty())
+      assertTrue(games.isEmpty())
     }
   }
 }
