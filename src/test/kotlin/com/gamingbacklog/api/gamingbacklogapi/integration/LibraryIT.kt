@@ -1,40 +1,62 @@
-package com.gamingbacklog.api.gamingbacklogapi.unit.controllers
+package com.gamingbacklog.api.gamingbacklogapi.integration
 
+import com.gamingbacklog.api.gamingbacklogapi.clients.IGDBClient
 import com.gamingbacklog.api.gamingbacklogapi.controllers.LibraryController
-import com.gamingbacklog.api.gamingbacklogapi.models.GameInstance
+import com.gamingbacklog.api.gamingbacklogapi.integration.constants.GameInstanceSamples.game10
+import com.gamingbacklog.api.gamingbacklogapi.integration.constants.GameInstanceSamples.game5
+import com.gamingbacklog.api.gamingbacklogapi.integration.constants.GameInstanceSamples.game7
+import com.gamingbacklog.api.gamingbacklogapi.integration.constants.GameInstanceSamples.game8
+import com.gamingbacklog.api.gamingbacklogapi.integration.constants.GameInstanceSamples.game9
+import com.gamingbacklog.api.gamingbacklogapi.integration.utils.RequestBuilder
+import com.gamingbacklog.api.gamingbacklogapi.integration.utils.TestUtils.requestToString
 import com.gamingbacklog.api.gamingbacklogapi.models.Library
-import com.gamingbacklog.api.gamingbacklogapi.models.enums.LibraryStatus
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.LibraryRequest
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.UpdateLibraryGamesRequest
-import com.gamingbacklog.api.gamingbacklogapi.models.results.LibraryResult
+import com.gamingbacklog.api.gamingbacklogapi.models.responses.GameResponse
+import com.gamingbacklog.api.gamingbacklogapi.repositories.GameInstanceRepository
+import com.gamingbacklog.api.gamingbacklogapi.repositories.GameRepository
+import com.gamingbacklog.api.gamingbacklogapi.repositories.LibraryRepository
+import com.gamingbacklog.api.gamingbacklogapi.services.GameInstanceService
+import com.gamingbacklog.api.gamingbacklogapi.services.GameService
 import com.gamingbacklog.api.gamingbacklogapi.services.LibraryService
 import com.google.gson.Gson
-import org.hamcrest.CoreMatchers.*
+import org.bson.types.ObjectId
+import org.hamcrest.CoreMatchers
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.*
-import org.mockito.BDDMockito.given
-import org.mockito.Mockito.mock
+import org.mockito.Mockito
 import org.mockito.kotlin.any
+import org.mockito.kotlin.given
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.TestPropertySource
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(LibraryController::class)
 @TestPropertySource(properties = ["CLIENT_ID=test_id", "CLIENT_SECRET=test_secret"])
-class LibraryControllerTests {
-  lateinit var libraryService: LibraryService
+class LibraryIT {
+  private val libraryRepository = Mockito.mock(LibraryRepository::class.java)
+  private val gameRepository = Mockito.mock(GameRepository::class.java)
+  private val gameInstanceRepository = Mockito.mock(GameInstanceRepository::class.java)
+  private val igdbClient = Mockito.mock(IGDBClient::class.java)
+  private val gameService = GameService(gameRepository, igdbClient)
+  private val libraryService = LibraryService(libraryRepository, gameService, GameInstanceService(gameInstanceRepository, gameService))
   lateinit var requestBuilder: RequestBuilder
   var endpoint = "/libraries/"
-  var id1 = "70b664a416135a6e967fadc6"
-  var id2 = "dd7f03b962f1f3416d08ee0f"
+  val id1 = "70b664a416135a6e967fadc6"
+  val id2 = "dd7f03b962f1f3416d08ee0f"
+  val id3 = "5e11b8c6fbb706c75e058337"
+  val id4 = "8e9f5b65026d638f7cd75166"
 
   @BeforeEach
   fun configureSystem() {
-    libraryService = mock(LibraryService::class.java)
     val libraryController = LibraryController(libraryService)
     val mockMvc = MockMvcBuilders.standaloneSetup(libraryController)
       .build()
@@ -49,10 +71,10 @@ class LibraryControllerTests {
       val library = Library(id1, "Owned Games", ArrayList())
       library.games.add("gameId1")
       library.games.add("gameId2")
-      given(libraryService.getSingle(any())).willReturn(library)
+      given(libraryRepository.findOneById(any())).willReturn(library)
       endpoint += "$id1/"
       requestBuilder.runGetRequest(endpoint)
-        .andExpect(status().isOk)
+        .andExpect(MockMvcResultMatchers.status().isOk)
         .andExpect(jsonPath("$.name", equalTo("Owned Games")))
         .andExpect(jsonPath("$.games[0]", equalTo("gameId1")))
         .andExpect(jsonPath("$.games[1]", equalTo("gameId2")))
@@ -61,7 +83,7 @@ class LibraryControllerTests {
 
     @Test
     fun shouldReturnNoLibrary() {
-      given(libraryService.getSingle(any())).willReturn(null)
+      given(libraryRepository.findOneById(any())).willReturn(null)
       endpoint += "$id1/"
       requestBuilder.runGetRequest(endpoint)
         .andExpect(status().isOk)
@@ -75,7 +97,6 @@ class LibraryControllerTests {
     @Test
     fun shouldSuccessfullyCreateLibraryWithNoGamesPassedIn() {
       val library = Library(id2, "Backlog", ArrayList())
-      given(libraryService.create(any())).willReturn(library)
       val libraryRequest = LibraryRequest("Backlog", null)
       requestBuilder.runPostRequest(endpoint, requestToString(libraryRequest))
         .andExpect(status().isCreated)
@@ -87,7 +108,6 @@ class LibraryControllerTests {
     fun shouldSuccessfullyCreateLibraryWithGamesPassedIn() {
       val library = Library(id2, "Backlog", ArrayList())
       library.games.add(id1)
-      given(libraryService.create(any())).willReturn(library)
       val libraryRequest = LibraryRequest("Backlog", arrayListOf(id1))
       requestBuilder.runPostRequest(endpoint, requestToString(libraryRequest))
         .andExpect(status().isCreated)
@@ -99,17 +119,19 @@ class LibraryControllerTests {
   @Nested
   @DisplayName("Tests for addToLibrary")
   inner class AddToLibrary {
+
     @Test
     fun shouldSuccessfullyAddToLibrary() {
       val library = Library(id2, "Backlog", ArrayList())
-      given(libraryService.addToLibrary(any(), any())).will {
-        library.games.add(id1)
-        LibraryResult(library, LibraryStatus.SUCCESS)
-      }
+      given(gameInstanceRepository.findOneById(any())).willReturn(game5)
+      given(gameInstanceRepository.findByName(any())).willReturn(game5)
+      given(libraryRepository.findOneById(any())).willReturn(library)
       val request = UpdateLibraryGamesRequest(id1)
       requestBuilder.runPostRequest("$endpoint$id2/games", Gson().toJson(request))
         .andExpect(status().isOk)
-      Assertions.assertTrue(library.games.contains(id1))
+        .andExpect(jsonPath("$.name", equalTo(library.name)))
+        .andExpect(jsonPath("$.games[0].id", equalTo(id1)))
+        .andExpect(jsonPath("$.games[0].name", equalTo("Trails in the Sky")))
     }
   }
 
@@ -121,12 +143,12 @@ class LibraryControllerTests {
       val library1 = Library("id1", "Backlog", ArrayList())
       val libraries = ArrayList<Library>()
       libraries.add(library1)
-      given(libraryService.delete(any())).will {
+      given(libraryRepository.deleteById(any())).willAnswer {
         libraries.remove(library1)
       }
       requestBuilder.runDeleteRequest("$endpoint/$id1")
         .andExpect(status().isOk)
-        .andExpect(content().string(containsString("Successfully deleted library")))
+        .andExpect(MockMvcResultMatchers.content().string(CoreMatchers.containsString("Successfully deleted library")))
       Assertions.assertTrue(libraries.isEmpty())
     }
   }
@@ -137,14 +159,14 @@ class LibraryControllerTests {
     @Test
     fun shouldGetGameFromLibrarySuccessfully() {
       val library = Library("id1", "Backlog", ArrayList())
-      library.games.add("gameId1")
-      val game = GameInstance("gameId1", "19", "Fire Emblem: Engage",
-        arrayListOf("Nintendo Switch"), arrayListOf("RPG"), arrayListOf("Fire Emblem"), arrayListOf("Nintendo", "Intelligent Systems"),
-        arrayListOf("January 20 2023"), arrayListOf(""), "Shine on, Emblem of Beginnings!")
-      given(libraryService.getGameFromLibrary(any(), any())).willReturn(game)
-      endpoint += "$id1/games/${"gameId1"}"
+      library.games.add(id2)
+      given(libraryRepository.findOneById(any())).willReturn(library)
+      given(gameInstanceRepository.findOneById(any())).willReturn(game7)
+      given(gameInstanceRepository.findByName(any())).willReturn(game7)
+      endpoint += "$id1/games/$id2"
       requestBuilder.runGetRequest(endpoint)
         .andExpect(status().isOk)
+        .andExpect(jsonPath("$.id", equalTo(id2)))
         .andExpect(jsonPath("$.name", equalTo("Fire Emblem: Engage")))
         .andExpect(jsonPath("$.igdbId", equalTo("19")))
         .andExpect(jsonPath("$.platforms[0]", equalTo("Nintendo Switch")))
@@ -154,14 +176,14 @@ class LibraryControllerTests {
         .andExpect(jsonPath("$.companies[1]", equalTo("Intelligent Systems")))
         .andExpect(jsonPath("$.releaseDate[0]", equalTo("January 20 2023")))
         .andExpect(jsonPath("$.images[0]", equalTo("")))
-        .andExpect(jsonPath("$.id", equalTo("gameId1")))
     }
 
     @Test
     fun shouldGetNotFoundForGameInLibrary() {
       val library = Library("id1", "Backlog", ArrayList())
-      given(libraryService.getGameFromLibrary(any(), any())).willReturn(null)
-      endpoint += "$id1/games/${"gameId1"}"
+      given(libraryRepository.findOneById(any())).willReturn(library)
+      given(gameInstanceRepository.findOneById(any())).willReturn(null)
+      endpoint += "$id1/games/${id2}"
       requestBuilder.runGetRequest(endpoint)
         .andExpect(status().isNotFound)
         .andExpect(jsonPath("$").doesNotExist())
@@ -173,20 +195,23 @@ class LibraryControllerTests {
   inner class DeleteGameFromLibraryTests {
     @Test
     fun shouldSuccessfullyDeleteGameFromLibrary() {
-      val library = Library("library-id1", "Backlog", arrayListOf("id1", "id2", "id3"))
-      given(libraryService.deleteGameFromLibrary(id2, id1)).will {
-        library.games.remove("id1")
-        LibraryResult(library, LibraryStatus.SUCCESS)
-      }
-      val request = UpdateLibraryGamesRequest(id1)
-      requestBuilder.runDeleteRequest("$endpoint$id2/games", Gson().toJson(request))
-        .andExpect(status().isOk)
-      Assertions.assertFalse(library.games.contains("id1"))
-      Assertions.assertTrue(library.games.containsAll(listOf("id2", "id3")))
-    }
-  }
+      val library = Library(id1, "Backlog", arrayListOf(id2, id3, id4))
+      given(libraryRepository.findOneById(any())).willReturn(library)
+      given(gameInstanceRepository.findOneById(ObjectId(id2))).willReturn(game8)
+      given(gameInstanceRepository.findOneById(ObjectId(id3))).willReturn(game9)
+      given(gameInstanceRepository.findOneById(ObjectId(id4))).willReturn(game10)
+      given(gameInstanceRepository.findByName("Super Mario 64")).willReturn(game8)
+      given(gameInstanceRepository.findByName("Super Mario Sunshine")).willReturn(game9)
+      given(gameInstanceRepository.findByName("Super Mario Galaxy")).willReturn(game10)
 
-  fun requestToString(request: LibraryRequest): String {
-    return Gson().toJson(request)
+      val request = UpdateLibraryGamesRequest(id3)
+      requestBuilder.runDeleteRequest("$endpoint$id1/games", Gson().toJson(request))
+        .andExpect(status().isOk)
+        .andExpect(jsonPath<List<GameResponse>>("$.games", hasSize(2)))
+        .andExpect(jsonPath("$.games[0].id", equalTo(id2)))
+        .andExpect(jsonPath("$.games[0].name", equalTo("Super Mario 64")))
+        .andExpect(jsonPath("$.games[1].id", equalTo(id4)))
+        .andExpect(jsonPath("$.games[1].name", equalTo("Super Mario Galaxy")))
+    }
   }
 }

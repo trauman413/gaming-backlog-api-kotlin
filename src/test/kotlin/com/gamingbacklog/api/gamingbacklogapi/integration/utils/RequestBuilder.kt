@@ -1,4 +1,4 @@
-package com.gamingbacklog.api.gamingbacklogapi.unit.controllers
+package com.gamingbacklog.api.gamingbacklogapi.integration.utils
 
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
