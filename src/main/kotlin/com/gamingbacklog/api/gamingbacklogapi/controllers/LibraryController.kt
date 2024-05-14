@@ -83,6 +83,19 @@ class LibraryController(private val libraryService: LibraryService) {
     }
   }
 
+  @PatchMapping("/{id}")
+  fun updateLibrary(
+          @PathVariable("id") id: String,
+          @RequestBody libraryRequest: LibraryRequest
+  ): ResponseEntity<LibraryResponse> {
+    val libraryResult = libraryService.updateName(id, libraryRequest.name)
+    return when (libraryResult.libraryStatus) {
+      LibraryStatus.SUCCESS -> ResponseEntity.ok(libraryResult.library?.let { libraryService.convertLibraryToResponse(it) })
+      LibraryStatus.LIBRARY_DOES_NOT_EXIST -> ResponseEntity<LibraryResponse>(HttpStatus.NOT_FOUND)
+      else -> ResponseEntity<LibraryResponse>(HttpStatus.INTERNAL_SERVER_ERROR) // should never reach this branch
+    }
+  }
+
   @DeleteMapping("/{id}")
   fun deleteLibrary(
     @PathVariable("id") id: String

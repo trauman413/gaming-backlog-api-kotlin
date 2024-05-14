@@ -134,6 +134,20 @@ class LibraryServiceTests {
   }
 
   @Nested
+  @DisplayName("Tests for updateName")
+  inner class UpdateLibraryName {
+    @Test
+    fun shouldUpdateName() {
+      val library = Library(libraryId, "old name", arrayListOf())
+      val request = LibraryRequest("Backlog", arrayListOf())
+      mockSave(library)
+      given(libraryRepository.findOneById(ObjectId(libraryId))).willReturn(library)
+      val result = libraryService.updateName(libraryId, request.name)
+      assertEquals(result.library?.name, "Backlog")
+    }
+  }
+
+  @Nested
   @DisplayName("Tests for deleteGameFromLibrary")
   inner class DeleteGameFromLibrary {
     @Test
