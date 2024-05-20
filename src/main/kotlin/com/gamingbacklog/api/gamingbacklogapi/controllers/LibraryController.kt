@@ -84,7 +84,7 @@ class LibraryController(private val libraryService: LibraryService) {
   }
 
   @PatchMapping("/{id}")
-  fun updateLibrary(
+  fun updateLibraryName(
           @PathVariable("id") id: String,
           @RequestBody libraryRequest: LibraryRequest
   ): ResponseEntity<LibraryResponse> {
