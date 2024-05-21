@@ -69,6 +69,18 @@ class LibraryService (
     return LibraryResult(null, LibraryStatus.LIBRARY_DOES_NOT_EXIST)
   }
 
+  fun updateName(id: String, name: String): LibraryResult {
+    val library = libraryRepository.findOneById(ObjectId(id))
+    val updatedLibrary = library?.let { Library(id, name, it.games) }
+    return if (updatedLibrary == null) {
+      LibraryResult(null, LibraryStatus.LIBRARY_DOES_NOT_EXIST)
+    } else {
+      libraryRepository.save(updatedLibrary)
+      LibraryResult(updatedLibrary, LibraryStatus.SUCCESS)
+    }
+  }
+
+
   fun deleteGameFromLibrary(libraryId: String, gameId: String): LibraryResult {
     if (!isValidGameInstanceId(gameId)) {
       return LibraryResult(null, LibraryStatus.GAME_DOES_NOT_EXIST)
