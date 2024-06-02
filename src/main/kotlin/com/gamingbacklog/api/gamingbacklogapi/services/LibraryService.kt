@@ -74,7 +74,7 @@ class LibraryService (
   fun addToLibraries(libraryIds: List<String>?, gameId: String): MultiLibraryResult {
     val failedLibraries = mutableListOf<LibraryResult>()
     if (libraryIds.isNullOrEmpty()) {
-      return MultiLibraryResult(emptyList(), MultiLibraryStatus.ALL_LIBRARIES_DO_NOT_EXIST)
+      return MultiLibraryResult(emptyList(), MultiLibraryStatus.EMPTY_LIBRARIES)
     }
     if (!isValidGameInstanceId(gameId)) {
       return MultiLibraryResult(emptyList(), MultiLibraryStatus.GAME_DOES_NOT_EXIST)

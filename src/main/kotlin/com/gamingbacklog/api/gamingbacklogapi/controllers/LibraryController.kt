@@ -63,13 +63,13 @@ class LibraryController(private val libraryService: LibraryService) {
   }
 
   @PostMapping("/games")
-  fun addToLibrary(
+  fun addToLibraries(
     @RequestBody addGameToLibrary: UpdateLibraryGamesRequest,
   ): ResponseEntity<List<LibraryResult>> {
     val libraryResult = libraryService.addToLibraries(addGameToLibrary.libraryIds, addGameToLibrary.gameId)
     return when (libraryResult.libraryStatus) {
       MultiLibraryStatus.SUCCESS -> ResponseEntity.ok(null)
-      MultiLibraryStatus.ALL_LIBRARIES_DO_NOT_EXIST, MultiLibraryStatus.GAME_DOES_NOT_EXIST -> ResponseEntity<List<LibraryResult>>(HttpStatus.NOT_FOUND)
+      MultiLibraryStatus.EMPTY_LIBRARIES, MultiLibraryStatus.GAME_DOES_NOT_EXIST -> ResponseEntity<List<LibraryResult>>(HttpStatus.NOT_FOUND)
       MultiLibraryStatus.INDIVIDUAL_LIBRARY_ERROR -> ResponseEntity(libraryResult.libraries, HttpStatus.ACCEPTED)
     }
   }

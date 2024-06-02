@@ -153,9 +153,8 @@ class LibraryServiceTests {
 
     @Test
     fun shouldError_EmptyLibraryIds() {
-      given(gameInstanceService.getSingle(gameId1)).willReturn(testGameInstance)
       val result = libraryService.addToLibraries(emptyList(), gameId1)
-      assertEquals(MultiLibraryStatus.ALL_LIBRARIES_DO_NOT_EXIST, result.libraryStatus)
+      assertEquals(MultiLibraryStatus.EMPTY_LIBRARIES, result.libraryStatus)
     }
 
     @Test
