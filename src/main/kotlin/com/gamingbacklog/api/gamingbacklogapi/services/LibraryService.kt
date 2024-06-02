@@ -3,12 +3,14 @@ package com.gamingbacklog.api.gamingbacklogapi.services
 import com.gamingbacklog.api.gamingbacklogapi.models.GameInstance
 import com.gamingbacklog.api.gamingbacklogapi.models.Library
 import com.gamingbacklog.api.gamingbacklogapi.models.enums.LibraryStatus
+import com.gamingbacklog.api.gamingbacklogapi.models.enums.MultiLibraryStatus
 import com.gamingbacklog.api.gamingbacklogapi.repositories.LibraryRepository
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.LibraryRequest
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.Request
 import com.gamingbacklog.api.gamingbacklogapi.models.responses.GameResponse
 import com.gamingbacklog.api.gamingbacklogapi.models.responses.LibraryResponse
 import com.gamingbacklog.api.gamingbacklogapi.models.results.LibraryResult
+import com.gamingbacklog.api.gamingbacklogapi.models.results.MultiLibraryResult
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import java.util.ArrayList
@@ -67,6 +69,26 @@ class LibraryService (
       return LibraryResult(library, LibraryStatus.SUCCESS)
     }
     return LibraryResult(null, LibraryStatus.LIBRARY_DOES_NOT_EXIST)
+  }
+
+  fun addToLibraries(libraryIds: List<String>?, gameId: String): MultiLibraryResult {
+    val failedLibraries = mutableListOf<LibraryResult>()
+    if (libraryIds.isNullOrEmpty()) {
+      return MultiLibraryResult(emptyList(), MultiLibraryStatus.ALL_LIBRARIES_DO_NOT_EXIST)
+    }
+    if (!isValidGameInstanceId(gameId)) {
+      return MultiLibraryResult(emptyList(), MultiLibraryStatus.GAME_DOES_NOT_EXIST)
+    }
+    libraryIds.forEach { libraryId ->
+      val result = addToLibrary(libraryId, gameId)
+      if (result.libraryStatus != LibraryStatus.SUCCESS) {
+        failedLibraries.add(result)
+      }
+    }
+    if (failedLibraries.isNotEmpty()) {
+      return MultiLibraryResult(failedLibraries, MultiLibraryStatus.INDIVIDUAL_LIBRARY_ERROR)
+    }
+    return MultiLibraryResult(emptyList(), MultiLibraryStatus.SUCCESS)
   }
 
   fun updateName(id: String, name: String): LibraryResult {

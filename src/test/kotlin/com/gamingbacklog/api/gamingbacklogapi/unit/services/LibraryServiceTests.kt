@@ -3,6 +3,7 @@ package com.gamingbacklog.api.gamingbacklogapi.unit.services
 import com.gamingbacklog.api.gamingbacklogapi.models.GameInstance
 import com.gamingbacklog.api.gamingbacklogapi.models.Library
 import com.gamingbacklog.api.gamingbacklogapi.models.enums.LibraryStatus
+import com.gamingbacklog.api.gamingbacklogapi.models.enums.MultiLibraryStatus
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.LibraryRequest
 import com.gamingbacklog.api.gamingbacklogapi.repositories.LibraryRepository
 import com.gamingbacklog.api.gamingbacklogapi.services.GameInstanceService
@@ -32,6 +33,8 @@ class LibraryServiceTests {
   private val mockLibraryDb = HashMap<String, Library>()
 
   private val libraryId = "70b664a416135a6e967fadc6"
+  private val libraryId2 = "80b664a416345a6e967fadc7"
+  private val libraryId3 = "90b664a876345a6e367fadc7"
   private val gameId1 = "81c775b527246b7f078gbde7"
 
   private val testGameInstance = GameInstance(
@@ -131,6 +134,53 @@ class LibraryServiceTests {
       assertNull(result.library)
       assertEquals(LibraryStatus.GAME_DOES_NOT_EXIST, result.libraryStatus)
     }
+  }
+
+  @Nested
+  @DisplayName("Tests for addToLibraries")
+  inner class AddToLibraries {
+    private val libraryIds = listOf(libraryId, libraryId2, libraryId3)
+    @Test
+    fun shouldAllSucceed() {
+      given(gameInstanceService.getSingle(gameId1)).willReturn(testGameInstance)
+      var count = 1
+      libraryIds.forEach {
+        saveMockLibraryDB(it, "${count++}", arrayListOf())
+      }
+      val result = libraryService.addToLibraries(libraryIds, gameId1)
+      assertEquals(MultiLibraryStatus.SUCCESS, result.libraryStatus)
+    }
+
+    @Test
+    fun shouldError_EmptyLibraryIds() {
+      given(gameInstanceService.getSingle(gameId1)).willReturn(testGameInstance)
+      val result = libraryService.addToLibraries(emptyList(), gameId1)
+      assertEquals(MultiLibraryStatus.ALL_LIBRARIES_DO_NOT_EXIST, result.libraryStatus)
+    }
+
+    @Test
+    fun shouldError_InvalidGameInstanceId() {
+      given(gameInstanceService.getSingle(gameId1)).willReturn(null)
+      var count = 1
+      libraryIds.forEach {
+        saveMockLibraryDB(it, "${count++}", arrayListOf())
+      }
+      val result = libraryService.addToLibraries(libraryIds, gameId1)
+      assertEquals(MultiLibraryStatus.GAME_DOES_NOT_EXIST, result.libraryStatus)
+    }
+
+    @Test
+    fun shouldError_IndividualError() {
+      given(gameInstanceService.getSingle(gameId1)).willReturn(testGameInstance)
+      saveMockLibraryDB(libraryId, "1", arrayListOf())
+      saveMockLibraryDB(libraryId2, "2", arrayListOf(gameId1))
+      saveMockLibraryDB(libraryId3, "3", arrayListOf())
+      val result = libraryService.addToLibraries(libraryIds, gameId1)
+      assertEquals(MultiLibraryStatus.INDIVIDUAL_LIBRARY_ERROR, result.libraryStatus)
+      assertEquals(1, result.libraries.size)
+      assertEquals(LibraryStatus.GAME_DUPLICATE_FOUND, result.libraries?.get(0)?.libraryStatus)
+    }
+
   }
 
   @Nested
