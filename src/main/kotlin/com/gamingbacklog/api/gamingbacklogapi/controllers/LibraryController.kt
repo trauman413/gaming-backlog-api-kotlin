@@ -57,7 +57,7 @@ class LibraryController(private val libraryService: LibraryService) {
     val libraryResult = libraryService.addToLibrary(libraryId, addGameToLibrary.gameId)
     return when (libraryResult.libraryStatus) {
       LibraryStatus.SUCCESS -> ResponseEntity.ok(libraryResult.library?.let { libraryService.convertLibraryToResponse(it) })
-      LibraryStatus.LIBRARY_DOES_NOT_EXIST, LibraryStatus.GAME_DOES_NOT_EXIST -> ResponseEntity<LibraryResponse>(HttpStatus.BAD_REQUEST)
+      LibraryStatus.LIBRARY_DOES_NOT_EXIST, LibraryStatus.GAME_DOES_NOT_EXIST -> ResponseEntity<LibraryResponse>(HttpStatus.NOT_FOUND)
       LibraryStatus.GAME_DUPLICATE_FOUND -> ResponseEntity<LibraryResponse>(HttpStatus.BAD_REQUEST)
     }
   }
@@ -69,7 +69,8 @@ class LibraryController(private val libraryService: LibraryService) {
     val libraryResult = libraryService.addToLibraries(addGameToLibrary.libraryIds, addGameToLibrary.gameId)
     return when (libraryResult.libraryStatus) {
       MultiLibraryStatus.SUCCESS -> ResponseEntity.ok(null)
-      MultiLibraryStatus.EMPTY_LIBRARIES, MultiLibraryStatus.GAME_DOES_NOT_EXIST -> ResponseEntity<List<LibraryResult>>(HttpStatus.NOT_FOUND)
+      MultiLibraryStatus.EMPTY_LIBRARIES -> ResponseEntity<List<LibraryResult>>(HttpStatus.BAD_REQUEST)
+      MultiLibraryStatus.GAME_DOES_NOT_EXIST -> ResponseEntity<List<LibraryResult>>(HttpStatus.NOT_FOUND)
       MultiLibraryStatus.INDIVIDUAL_LIBRARY_ERROR -> ResponseEntity(libraryResult.libraries, HttpStatus.ACCEPTED)
     }
   }
