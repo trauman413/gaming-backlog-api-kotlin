@@ -40,7 +40,8 @@ class UserService(
       displayName = userRequest.displayName,
       password = userRequest.password,
       email = userRequest.email,
-      libraries = arrayListOf(defaultLibrary.id)
+      libraries = arrayListOf(defaultLibrary.id),
+      authenticated = false
     )
     userRepository.save(user)
     return user
@@ -74,7 +75,15 @@ class UserService(
 
   fun authenticateUser(userRequest: UserRequest, user: User): User? {
     // Super naive implementation right now :')
-    return if (user.password == userRequest.password) user else null;
+    if (user.password == userRequest.password) {
+      user.authenticated = true
+      return user
+    }
+    return null
+  }
+
+  fun logout(user: User) {
+    user.authenticated = false
   }
 
   fun createUserLibrary(userId: String, libraryRequest: LibraryRequest): UserResponse? {

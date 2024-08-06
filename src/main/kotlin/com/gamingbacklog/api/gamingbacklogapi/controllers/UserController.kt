@@ -47,6 +47,18 @@ class UserController(private val userService: UserService) {
     return ResponseEntity<UserResponse>(userService.convertUserToResponse(authenticatedUser), HttpStatus.OK)
   }
 
+  @PostMapping("/logout")
+  fun logout(
+          @RequestBody username: String
+  ): ResponseEntity<String> {
+    val user = userService.getSingleByName(username)
+    if (user != null) {
+      userService.logout(user)
+      return ResponseEntity.ok().build()
+    }
+    return ResponseEntity(HttpStatus.NOT_FOUND)
+  }
+
   @PatchMapping("/{id}")
   fun updateUserInfo(
     @PathVariable("id") id: String,
