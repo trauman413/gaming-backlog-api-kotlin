@@ -54,7 +54,7 @@ class UserController(private val userService: UserService) {
     val user = userService.getSingleByName(username)
     if (user != null) {
       userService.logout(user)
-      return ResponseEntity.ok().build()
+      return ResponseEntity.ok("Successfully logged out user $username")
     }
     return ResponseEntity(HttpStatus.NOT_FOUND)
   }
