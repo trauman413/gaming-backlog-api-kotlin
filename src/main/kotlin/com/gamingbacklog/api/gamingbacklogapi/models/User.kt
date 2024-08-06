@@ -11,5 +11,6 @@ data class User(
   var displayName: String,
   var password: String,
   var email: String,
-  var libraries: ArrayList<String> = ArrayList()
+  var libraries: ArrayList<String> = ArrayList(),
+  var authenticated: Boolean
 )
