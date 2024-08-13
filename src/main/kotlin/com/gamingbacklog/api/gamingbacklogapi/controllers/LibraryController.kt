@@ -3,9 +3,11 @@ package com.gamingbacklog.api.gamingbacklogapi.controllers
 import com.gamingbacklog.api.gamingbacklogapi.models.GameInstance
 import com.gamingbacklog.api.gamingbacklogapi.models.Library
 import com.gamingbacklog.api.gamingbacklogapi.models.enums.LibraryStatus
+import com.gamingbacklog.api.gamingbacklogapi.models.enums.MultiLibraryStatus
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.LibraryRequest
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.UpdateLibraryGamesRequest
 import com.gamingbacklog.api.gamingbacklogapi.models.responses.LibraryResponse
+import com.gamingbacklog.api.gamingbacklogapi.models.results.LibraryResult
 import com.gamingbacklog.api.gamingbacklogapi.services.LibraryService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -57,6 +59,19 @@ class LibraryController(private val libraryService: LibraryService) {
       LibraryStatus.SUCCESS -> ResponseEntity.ok(libraryResult.library?.let { libraryService.convertLibraryToResponse(it) })
       LibraryStatus.LIBRARY_DOES_NOT_EXIST, LibraryStatus.GAME_DOES_NOT_EXIST -> ResponseEntity<LibraryResponse>(HttpStatus.NOT_FOUND)
       LibraryStatus.GAME_DUPLICATE_FOUND -> ResponseEntity<LibraryResponse>(HttpStatus.BAD_REQUEST)
+    }
+  }
+
+  @PostMapping("/games")
+  fun addToLibraries(
+    @RequestBody addGameToLibrary: UpdateLibraryGamesRequest,
+  ): ResponseEntity<List<LibraryResult>> {
+    val libraryResult = libraryService.addToLibraries(addGameToLibrary.libraryIds, addGameToLibrary.gameId)
+    return when (libraryResult.libraryStatus) {
+      MultiLibraryStatus.SUCCESS -> ResponseEntity.ok(null)
+      MultiLibraryStatus.EMPTY_LIBRARIES -> ResponseEntity<List<LibraryResult>>(HttpStatus.BAD_REQUEST)
+      MultiLibraryStatus.GAME_DOES_NOT_EXIST -> ResponseEntity<List<LibraryResult>>(HttpStatus.NOT_FOUND)
+      MultiLibraryStatus.INDIVIDUAL_LIBRARY_ERROR -> ResponseEntity(libraryResult.libraries, HttpStatus.ACCEPTED)
     }
   }
 

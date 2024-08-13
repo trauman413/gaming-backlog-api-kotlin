@@ -133,6 +133,18 @@ class LibraryIT {
         .andExpect(jsonPath("$.games[0].id", equalTo(id1)))
         .andExpect(jsonPath("$.games[0].name", equalTo("Trails in the Sky")))
     }
+
+    @Test
+    fun shouldSuccessfullyAddToLibraryMultipleLibraries() {
+      val library = Library(id2, "Backlog", ArrayList())
+      val library2 = Library(id3, "Wishlist", ArrayList())
+      given(gameInstanceRepository.findOneById(any())).willReturn(game5)
+      given(gameInstanceRepository.findByName(any())).willReturn(game5)
+      given(libraryRepository.findOneById(any())).willReturn(library).willReturn(library2)
+      val request = UpdateLibraryGamesRequest(id1, listOf(id2, id3))
+      requestBuilder.runPostRequest("$endpoint/games", Gson().toJson(request))
+        .andExpect(status().isOk)
+    }
   }
 
   @Nested
