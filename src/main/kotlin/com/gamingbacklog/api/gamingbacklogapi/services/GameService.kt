@@ -7,6 +7,9 @@ import com.gamingbacklog.api.gamingbacklogapi.repositories.GameRepository
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.GameRequest
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.Request
 import org.bson.types.ObjectId
+import org.springframework.data.domain.Example
+import org.springframework.data.domain.ExampleMatcher
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import kotlin.collections.ArrayList
 
@@ -27,6 +30,27 @@ class GameService(
   override fun getSingleByName(name: String): Game? {
     return gameRepository.findByName(name)
 
+  }
+
+  // TODO: figure out how to get substring matching to work with spring
+  fun searchGamesBySubstring(substring: String): List<Game> {
+    val matcher = ExampleMatcher.matching()
+            .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.contains())
+    val example = Example.of(
+            Game(
+                    id = ObjectId.get().toString(),
+                    "",
+                    substring,
+                    listOf(""),
+                    listOf(""),
+                    listOf(""),
+                    listOf(""),
+                    listOf(""),
+                    listOf(""),
+                    "" ),
+            matcher)
+    val sort = Sort.by(Sort.Direction.ASC, "name");
+    return gameRepository.findAll(example, sort)
   }
 
   fun getByIGDBId(igdbId: String): Game? {
