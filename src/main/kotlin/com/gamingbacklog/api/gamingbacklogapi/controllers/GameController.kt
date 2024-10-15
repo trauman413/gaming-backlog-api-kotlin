@@ -27,11 +27,12 @@ class GameController(
     return ResponseEntity.ok(games)
   }
 
-  @GetMapping("/search/{searchTerm}")
-  fun searchGamesBySubstring(@PathVariable("searchTerm") searchTerm: String): ResponseEntity<List<GameResponse>> {
-    val gameResults = gameService.searchGamesBySubstring(searchTerm)
-    return ResponseEntity.ok(mapGamesToResponses(gameResults))
-  }
+// TODO: figure out how to get substring matching to work with spring
+//  @GetMapping("/search/{searchTerm}")
+//  fun searchGamesBySubstring(@PathVariable("searchTerm") searchTerm: String): ResponseEntity<List<GameResponse>> {
+//    val gameResults = gameService.searchGamesBySubstring(searchTerm)
+//    return ResponseEntity.ok(mapGamesToResponses(gameResults))
+//  }
 
   /**
    * Returns a single game based on an id
@@ -44,6 +45,18 @@ class GameController(
   ): ResponseEntity<Game> {
     val game = gameService.getSingle(id)
     return ResponseEntity.ok(game)
+  }
+
+  @GetMapping("/search/{name}")
+  fun getSingleGameByName(
+    @PathVariable("name") name: String
+  ): ResponseEntity<GameResponse> {
+    val game = gameService.getSingleByName(name)
+    return if (game != null) {
+      ResponseEntity.ok(GameResponse(game.id, game.name))
+    } else {
+      ResponseEntity.ok().build();
+    }
   }
 
   @GetMapping("/authenticate")
