@@ -7,9 +7,6 @@ import com.gamingbacklog.api.gamingbacklogapi.repositories.GameRepository
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.GameRequest
 import com.gamingbacklog.api.gamingbacklogapi.models.requests.Request
 import org.bson.types.ObjectId
-import org.springframework.data.domain.Example
-import org.springframework.data.domain.ExampleMatcher
-import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import kotlin.collections.ArrayList
 
