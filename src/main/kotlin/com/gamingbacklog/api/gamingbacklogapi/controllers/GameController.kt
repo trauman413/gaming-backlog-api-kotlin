@@ -27,13 +27,6 @@ class GameController(
     return ResponseEntity.ok(games)
   }
 
-// TODO: figure out how to get substring matching to work with spring
-//  @GetMapping("/search/{searchTerm}")
-//  fun searchGamesBySubstring(@PathVariable("searchTerm") searchTerm: String): ResponseEntity<List<GameResponse>> {
-//    val gameResults = gameService.searchGamesBySubstring(searchTerm)
-//    return ResponseEntity.ok(mapGamesToResponses(gameResults))
-//  }
-
   /**
    * Returns a single game based on an id
    * @param id  A given game ID
