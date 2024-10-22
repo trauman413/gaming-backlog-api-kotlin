@@ -32,27 +32,6 @@ class GameService(
 
   }
 
-// TODO: figure out how to get substring matching to work with spring
-//  fun searchGamesBySubstring(substring: String): List<Game> {
-//    val matcher = ExampleMatcher.matching()
-//            .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.contains())
-//    val example = Example.of(
-//            Game(
-//                    id = ObjectId.get().toString(),
-//                    "",
-//                    substring,
-//                    listOf(""),
-//                    listOf(""),
-//                    listOf(""),
-//                    listOf(""),
-//                    listOf(""),
-//                    listOf(""),
-//                    "" ),
-//            matcher)
-//    val sort = Sort.by(Sort.Direction.ASC, "name");
-//    return gameRepository.findAll(example, sort)
-//  }
-
   fun getByIGDBId(igdbId: String): Game? {
     return gameRepository.findByigdbId(igdbId)
   }
