@@ -4,6 +4,7 @@ import com.gamingbacklog.api.gamingbacklogapi.clients.IGDBClient
 import com.gamingbacklog.api.gamingbacklogapi.models.Game
 import com.gamingbacklog.api.gamingbacklogapi.models.igdb.Credentials
 import com.gamingbacklog.api.gamingbacklogapi.models.igdb.IGDBGame
+import com.gamingbacklog.api.gamingbacklogapi.models.responses.GameResponse
 import com.gamingbacklog.api.gamingbacklogapi.services.GameService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -39,6 +40,18 @@ class GameController(
     return ResponseEntity.ok(game)
   }
 
+  @GetMapping("/search/{name}")
+  fun getSingleGameByName(
+    @PathVariable("name") name: String
+  ): ResponseEntity<GameResponse> {
+    val game = gameService.getSingleByName(name)
+    return if (game != null) {
+      ResponseEntity.ok(GameResponse(game.id, game.name))
+    } else {
+      ResponseEntity.ok().build();
+    }
+  }
+
   @GetMapping("/authenticate")
   fun authenticateIGDB(): ResponseEntity<Credentials> {
     val creds = igdbClient.authenticate()
@@ -51,5 +64,9 @@ class GameController(
   ): ResponseEntity<Array<IGDBGame>> {
     val credentials = igdbClient.authenticate()
     return ResponseEntity.ok(igdbClient.gamesRequest(credentials.access_token, id))
+  }
+
+  fun mapGamesToResponses(games: List<Game>): List<GameResponse> {
+    return games.stream().map { game -> GameResponse(game.id, game.name) }.toList()
   }
 }
